@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/colorPrimaryDark">
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/app_name"
+              android:textColor="@android:color/white"
+              android:textSize="48sp"
+              android:fontFamily="sans-serif-light"
+              android:layout_gravity="center"
+              android:layout_marginTop="88dp"/>
+
+    <EditText android:id="@+id/verificationCodeEditText"
+              android:layout_width="match_parent"
+              android:layout_height="48dp"
+              android:layout_marginEnd="32dp"
+              android:layout_marginStart="32dp"
+              android:layout_marginTop="64dp"
+              android:gravity="center_vertical"
+              android:background="@drawable/rounded_container"
+              android:hint="Verification Code"
+              android:textSize="16sp"
+              android:paddingStart="16dp"
+              android:paddingEnd="16dp"
+              android:textColorHint="@android:color/tertiary_text_dark"
+              android:textColor="@android:color/white"/>
+
+    <Button android:id="@+id/verifyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verify"
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_container"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="24dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+</LinearLayout>
