@@ -25,7 +25,7 @@ class VerificationActivity : AppCompatActivity() {
     private fun verifyPhoneNumberWithCode(verificationId: String?, code: String) {
         val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
         FirebaseAuth.getInstance().signInWithCredential(credential)
-        val mainIntent = Intent(this@VerificationActivity, MainActivity::class.java)
+        val mainIntent = Intent(this@VerificationActivity, SettingsActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(mainIntent)

@@ -18,5 +18,6 @@
         </activity>
         <activity android:name=".VerificationActivity"/>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".SettingsActivity"/>
     </application>
 </manifest>
