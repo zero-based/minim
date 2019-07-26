@@ -1,8 +1,6 @@
 package com.minim.messenger
 
-import android.app.Activity
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -51,13 +49,21 @@ class SigningActivity : AppCompatActivity() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                 Log.d(ContentValues.TAG, "onVerificationCompleted:$credential")
-                FirebaseAuth.getInstance().signInWithCredential(credential)
-
-                val mainIntent = Intent(this@SigningActivity, MainActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(mainIntent)
-                finish()
+                FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener {
+                    if (it.result?.additionalUserInfo!!.isNewUser) {
+                        val mainIntent = Intent(this@SigningActivity, SettingsActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(mainIntent)
+                        finish()
+                    } else {
+                        val mainIntent = Intent(this@SigningActivity, MainActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(mainIntent)
+                        finish()
+                    }
+                }
             }
 
             override fun onVerificationFailed(e: FirebaseException) {

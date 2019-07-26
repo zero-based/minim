@@ -28,7 +28,7 @@
               android:paddingEnd="16dp"
               android:textColorHint="@android:color/tertiary_text_dark"
               android:textColor="@android:color/white"
-              android:inputType="number"/>
+              android:inputType="phone"/>
 
     <Button android:id="@+id/sendVerificationCodeButton"
             android:layout_width="wrap_content"
