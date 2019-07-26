@@ -17,5 +17,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".VerificationActivity"/>
+        <activity android:name=".MainActivity"/>
     </application>
 </manifest>
