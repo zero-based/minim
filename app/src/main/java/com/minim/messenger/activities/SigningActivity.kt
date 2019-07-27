@@ -1,4 +1,4 @@
-package com.minim.messenger
+package com.minim.messenger.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import com.minim.messenger.R
 import kotlinx.android.synthetic.main.signing_activity.*
 import java.util.concurrent.TimeUnit
 
