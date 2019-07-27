@@ -1,9 +1,10 @@
-package com.minim.messenger
+package com.minim.messenger.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
+import com.minim.messenger.R
 import kotlinx.android.synthetic.main.settings_activity.*
 
 class SettingsActivity : AppCompatActivity() {

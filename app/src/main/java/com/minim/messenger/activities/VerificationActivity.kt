@@ -1,8 +1,9 @@
-package com.minim.messenger
+package com.minim.messenger.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.PhoneAuthProvider
+import com.minim.messenger.R
 import kotlinx.android.synthetic.main.verification_activity.*
 
 class VerificationActivity : AppCompatActivity() {

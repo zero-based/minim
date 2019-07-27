@@ -1,4 +1,4 @@
-package com.minim.messenger
+package com.minim.messenger.models
 
 data class User(
     val uid: String,

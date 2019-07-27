@@ -1,8 +1,11 @@
-package com.minim.messenger
+package com.minim.messenger.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.minim.messenger.adaptors.ContactsAdaptor
+import com.minim.messenger.R
+import com.minim.messenger.models.User
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity() {

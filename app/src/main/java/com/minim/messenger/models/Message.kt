@@ -1,4 +1,4 @@
-package com.minim.messenger
+package com.minim.messenger.models
 
 import java.sql.Timestamp
 

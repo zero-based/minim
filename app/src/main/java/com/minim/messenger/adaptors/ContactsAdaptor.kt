@@ -1,4 +1,4 @@
-package com.minim.messenger
+package com.minim.messenger.adaptors
 
 import android.content.Context
 import android.content.Intent
@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.minim.messenger.R
+import com.minim.messenger.activities.MainActivity
+import com.minim.messenger.models.User
 
 class ContactsAdaptor(private val context: Context, private val users: ArrayList<User>) :
     RecyclerView.Adapter<ContactsAdaptor.ContactHolder>() {
