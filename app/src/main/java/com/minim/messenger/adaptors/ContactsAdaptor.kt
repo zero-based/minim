@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.minim.messenger.R
+import com.minim.messenger.activities.ConversationActivity
 import com.minim.messenger.activities.MainActivity
 import com.minim.messenger.models.User
 
@@ -23,7 +24,7 @@ class ContactsAdaptor(private val context: Context, private val users: ArrayList
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
         holder.contactUsername.text = users[position].username
         holder.parentLayout.setOnClickListener {
-            val intent = Intent(context, MainActivity::class.java)
+            val intent = Intent(context, ConversationActivity::class.java)
             context.startActivity(intent)
         }
     }

@@ -19,5 +19,6 @@
         <activity android:name=".activities.VerificationActivity"/>
         <activity android:name=".activities.MainActivity"/>
         <activity android:name=".activities.SettingsActivity"/>
+        <activity android:name=".activities.ConversationActivity"/>
     </application>
 </manifest>

@@ -6,4 +6,5 @@
     <string name="sendSms">Send SMS</string>
     <string name="username">username</string>
     <string name="save">Save</string>
+    <string name="message">message</string>
 </resources>
