@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">minim</string>
+    <string name="verify">Verify</string>
+    <string name="verificationCode">Verification Code</string>
+    <string name="phoneNumber">Phone Number</string>
+    <string name="sendSms">Send SMS</string>
 </resources>

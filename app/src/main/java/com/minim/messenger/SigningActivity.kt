@@ -17,18 +17,16 @@ import java.util.concurrent.TimeUnit
 
 class SigningActivity : AppCompatActivity() {
 
-    //private val auth = FirebaseAuth.getInstance()
-
-//    companion object {
-//        var storedVerificationId: String = ""
-//    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.signing_activity)
 
         sendVerificationCodeButton.setOnClickListener {
-            startPhoneNumberVerification(phoneNumberEditText.text.toString())
+            if (!phoneNumberEditText.text.isNullOrEmpty()) {
+                startPhoneNumberVerification(phoneNumberEditText.text.toString())
+            } else {
+                phoneNumberEditText.error = "Required Field."
+            }
         }
     }
 
@@ -72,7 +70,6 @@ class SigningActivity : AppCompatActivity() {
                 if (e is FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
                     phoneNumberEditText.error = "Invalid phone number."
-                    Toast.makeText(applicationContext, "Invalid phone number", Toast.LENGTH_LONG).show()
                 } else if (e is FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     Toast.makeText(applicationContext, "Try again Later", Toast.LENGTH_LONG).show()
