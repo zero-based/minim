@@ -1,6 +1,6 @@
 package com.minim.messenger
 
-import com.google.firebase.Timestamp
+import java.sql.Timestamp
 
 data class Message(
     val id: String,

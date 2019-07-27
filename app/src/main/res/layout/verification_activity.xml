@@ -4,11 +4,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimaryDark">
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="vertical"
                   android:layout_gravity="center">
-
 
         <TextView android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
                   android:layout_height="48dp"
                   android:layout_marginEnd="56dp"
                   android:layout_marginStart="56dp"
-                  android:layout_marginTop="64dp"
+                  android:layout_marginTop="40dp"
                   android:paddingStart="16dp"
                   android:paddingEnd="16dp"
                   android:hint="@string/verificationCode"
@@ -45,5 +45,7 @@
                 android:textColor="@android:color/white"
                 android:textAllCaps="false"
                 android:background="@drawable/rounded_container"/>
+
     </LinearLayout>
+
 </ScrollView>

@@ -1,7 +1,7 @@
 package com.minim.messenger
 
 data class User(
-    val username: String,
     val uid: String,
+    val username: String,
     val phoneNumber: String
 )

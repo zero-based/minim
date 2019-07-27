@@ -4,4 +4,6 @@
     <string name="verificationCode">Verification Code</string>
     <string name="phoneNumber">Phone Number</string>
     <string name="sendSms">Send SMS</string>
+    <string name="username">username</string>
+    <string name="save">Save</string>
 </resources>
