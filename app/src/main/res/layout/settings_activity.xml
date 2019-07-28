@@ -11,30 +11,31 @@
                   android:layout_gravity="center">
 
         <EditText android:id="@+id/userNameEditText"
-                  android:layout_width="280dp"
+                  android:layout_width="match_parent"
                   android:layout_height="48dp"
                   android:layout_marginEnd="56dp"
                   android:layout_marginStart="56dp"
+                  android:layout_marginTop="40dp"
+                  android:paddingStart="16dp"
+                  android:paddingEnd="16dp"
                   android:background="@drawable/rounded_container"
                   android:hint="@string/username"
                   android:textSize="16sp"
-                  android:paddingStart="16dp"
-                  android:paddingEnd="16dp"
                   android:textColorHint="@android:color/tertiary_text_dark"
                   android:textColor="@android:color/white"/>
 
         <Button android:id="@+id/saveSettingsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:textAllCaps="false"
                 android:layout_gravity="center"
-                android:background="@drawable/rounded_container"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
                 android:layout_marginTop="24dp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"/>
+                android:paddingEnd="16dp"
+                android:text="@string/save"
+                android:textAllCaps="false"
+                android:background="@drawable/rounded_container"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
 
     </LinearLayout>
 
