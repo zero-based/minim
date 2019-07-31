@@ -12,16 +12,16 @@ import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationActivity
 import com.minim.messenger.models.User
 
-class ContactsAdaptor(private val context: Context, val users: ArrayList<User>) :
+class ContactsAdaptor(private val context: Context, val contacts: ArrayList<User>) :
     RecyclerView.Adapter<ContactsAdaptor.ContactHolder>() {
 
-    override fun getItemCount() = users.size
+    override fun getItemCount() = contacts.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.contact_item, parent, false))
 
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
-        holder.contactUsername.text = users[position].username
+        holder.contactUsername.text = contacts[position].username
         holder.parentLayout.setOnClickListener {
             val intent = Intent(context, ConversationActivity::class.java)
             context.startActivity(intent)
