@@ -10,10 +10,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationActivity
-import com.minim.messenger.activities.MainActivity
 import com.minim.messenger.models.User
 
-class ContactsAdaptor(private val context: Context, private val users: ArrayList<User>) :
+class ContactsAdaptor(private val context: Context, val users: ArrayList<User>) :
     RecyclerView.Adapter<ContactsAdaptor.ContactHolder>() {
 
     override fun getItemCount() = users.size
