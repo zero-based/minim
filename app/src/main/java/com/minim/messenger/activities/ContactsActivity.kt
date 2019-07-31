@@ -1,6 +1,8 @@
 package com.minim.messenger.activities
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -34,6 +36,14 @@ class ContactsActivity : AppCompatActivity() {
                 addContact(searchBoxEditText.text.toString())
             }
         }
+
+        searchBoxEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) = Unit
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                adapter.filter.filter(s.toString())
+            }
+        })
 
     }
 
