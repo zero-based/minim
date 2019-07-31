@@ -1,12 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/colorPrimaryDark">
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/colorPrimaryDark"
+        android:padding="16dp"
+        android:focusableInTouchMode="true">
+
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/app_name"
+              android:textColor="@android:color/white"
+              android:textSize="32sp"
+              android:fontFamily="@font/typo_round_light"
+              android:layout_gravity="center"/>
+
+    <LinearLayout android:id="@+id/linearLayout"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center"
+                  android:layout_marginTop="16dp"
+                  android:layout_marginBottom="24dp">
+
+        <EditText android:id="@+id/searchBoxEditText"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1"
+                  android:paddingStart="16dp"
+                  android:paddingEnd="16dp"
+                  android:hint="@string/Search"
+                  android:textSize="16sp"
+                  android:maxLength="18"
+                  android:textColorHint="@android:color/tertiary_text_dark"
+                  android:textColor="@android:color/white"
+                  android:inputType="textShortMessage"
+                  android:background="@drawable/rounded_container"/>
+
+        <Button android:id="@+id/addButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingStart="9dp"
+                android:drawableStart="@android:drawable/ic_menu_add"
+                android:background="@android:color/transparent"/>
+
+        <Button android:id="@+id/settingsButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:drawableStart="@android:drawable/ic_menu_edit"
+                android:background="@android:color/transparent"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contactsRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"/>
+
 </LinearLayout>
