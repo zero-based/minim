@@ -17,6 +17,12 @@ import java.util.concurrent.TimeUnit
 
 class SigningActivity : AppCompatActivity() {
 
+    override fun onStart() {
+        super.onStart()
+        FirebaseAuth.getInstance().currentUser ?: return
+        startActivity(this, MainActivity::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -61,19 +67,26 @@ class SigningActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun signIn(activity: Activity, credential: PhoneAuthCredential) {
+
+        fun signIn(context: Activity, credential: PhoneAuthCredential) {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener {
-                val destination = if (it.result?.additionalUserInfo!!.isNewUser) {
+                val isNewUser = it.result?.additionalUserInfo!!.isNewUser
+                val destination = if (isNewUser) {
                     SettingsActivity::class.java
                 } else {
                     MainActivity::class.java
                 }
-                val intent = Intent(activity, destination)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                activity.startActivity(intent)
-                activity.finish()
+                startActivity(context, destination)
             }
         }
+
+        private fun startActivity(context: Activity, destination: Class<out AppCompatActivity>) {
+            val intent = Intent(context, destination)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+            context.finish()
+        }
+
     }
 }
