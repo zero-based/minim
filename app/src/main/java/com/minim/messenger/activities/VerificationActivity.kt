@@ -4,14 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.PhoneAuthProvider
 import com.minim.messenger.R
-import kotlinx.android.synthetic.main.verification_activity.*
+import kotlinx.android.synthetic.main.activity_verification.*
 
 class VerificationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.verification_activity)
+        setContentView(R.layout.activity_verification)
 
         verifyButton.setOnClickListener {
             val verificationId = intent.getStringExtra("verificationId")

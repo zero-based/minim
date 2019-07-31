@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.minim.messenger.R
-import kotlinx.android.synthetic.main.signing_activity.*
+import kotlinx.android.synthetic.main.activity_signing.*
 import java.util.concurrent.TimeUnit
 
 class SigningActivity : AppCompatActivity() {
@@ -26,7 +26,7 @@ class SigningActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.signing_activity)
+        setContentView(R.layout.activity_signing)
 
         sendVerificationCodeButton.setOnClickListener {
             if (!phoneNumberEditText.text.isNullOrEmpty()) {
