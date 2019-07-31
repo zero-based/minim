@@ -18,7 +18,7 @@ class ContactsAdaptor(private val context: Context, val contacts: ArrayList<User
     override fun getItemCount() = contacts.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.contact_item, parent, false))
+        ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false))
 
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
         holder.contactUsername.text = contacts[position].username

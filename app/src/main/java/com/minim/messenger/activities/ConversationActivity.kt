@@ -6,14 +6,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.minim.messenger.R
 import com.minim.messenger.adaptors.ConversationAdaptor
 import com.minim.messenger.models.Message
-import kotlinx.android.synthetic.main.conversation_activity.*
+import kotlinx.android.synthetic.main.activity_conversation.*
 import com.google.firebase.Timestamp
 import com.minim.messenger.models.MessageType
 
 class ConversationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.conversation_activity)
+        setContentView(R.layout.activity_conversation)
         initRecyclerView()
 
     }

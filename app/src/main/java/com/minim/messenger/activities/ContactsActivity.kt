@@ -9,7 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adaptors.ContactsAdaptor
 import com.minim.messenger.models.User
-import kotlinx.android.synthetic.main.contacts_activity.*
+import kotlinx.android.synthetic.main.activity_contacts.*
 
 class ContactsActivity : AppCompatActivity() {
 
@@ -21,7 +21,7 @@ class ContactsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.contacts_activity)
+        setContentView(R.layout.activity_contacts)
 
         val authUser = auth.currentUser!!
         currentUser = User(authUser.uid, authUser.phoneNumber, authUser.displayName)

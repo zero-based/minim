@@ -25,7 +25,7 @@
             android:id="@+id/messagesRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            tools:listitem="@layout/contact_item"
+            tools:listitem="@layout/item_contact"
             tools:itemCount="100"
             android:padding="16dp"
             app:layout_constraintTop_toBottomOf="@id/receiverUsername"

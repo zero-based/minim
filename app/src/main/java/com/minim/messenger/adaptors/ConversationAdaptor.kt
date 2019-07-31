@@ -19,8 +19,8 @@ class ConversationAdaptor(private val messages: ArrayList<Message>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
 
         val layoutType = when (viewType) {
-            MessageType.TO.value -> R.layout.message_from_item
-            MessageType.FROM.value -> R.layout.message_to_item
+            MessageType.TO.value -> R.layout.item_message_from
+            MessageType.FROM.value -> R.layout.item_message_to
             else -> -1
         }
 
