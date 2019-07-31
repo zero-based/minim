@@ -7,4 +7,5 @@
     <string name="username">username</string>
     <string name="save">Save</string>
     <string name="message">message</string>
+    <string name="Search">search</string>
 </resources>
