@@ -20,7 +20,7 @@ class SigningActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         FirebaseAuth.getInstance().currentUser ?: return
-        startActivity(this, MainActivity::class.java)
+        startActivity(this, ContactsActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,13 +74,13 @@ class SigningActivity : AppCompatActivity() {
                 val destination = if (isNewUser) {
                     SettingsActivity::class.java
                 } else {
-                    MainActivity::class.java
+                    ContactsActivity::class.java
                 }
                 startActivity(context, destination)
             }
         }
 
-        private fun startActivity(context: Activity, destination: Class<out AppCompatActivity>) {
+        fun startActivity(context: Activity, destination: Class<out AppCompatActivity>) {
             val intent = Intent(context, destination)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
