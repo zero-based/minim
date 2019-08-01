@@ -28,12 +28,12 @@ class SigningActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signing)
 
-        sendVerificationCodeButton.setOnClickListener {
-            if (!phoneNumberEditText.text.isNullOrEmpty()) {
-                val number = phoneNumberEditText.text.toString()
+        send_verification_code_button.setOnClickListener {
+            if (!phone_number_edit_text.text.isNullOrEmpty()) {
+                val number = phone_number_edit_text.text.toString()
                 PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, this, callbacks)
             } else {
-                phoneNumberEditText.error = "Required Field."
+                phone_number_edit_text.error = "Required Field."
             }
         }
 
@@ -57,7 +57,7 @@ class SigningActivity : AppCompatActivity() {
         override fun onVerificationFailed(e: FirebaseException) {
             if (e is FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
-                phoneNumberEditText.error = "Invalid phone number."
+                phone_number_edit_text.error = "Invalid phone number."
             } else if (e is FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
                 Toast.makeText(this@SigningActivity, "Try again Later", Toast.LENGTH_LONG).show()

@@ -4,16 +4,18 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minim.messenger.R
-import com.minim.messenger.adaptors.ConversationAdaptor
+import com.minim.messenger.adapters.ConversationAdapter
 import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation.*
 import com.google.firebase.Timestamp
+import com.minim.messenger.models.User
 
 class ConversationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
+        contact_username_text_view.text = intent.getParcelableExtra<User>("contact").username
         initRecyclerView()
     }
 
@@ -41,9 +43,9 @@ class ConversationActivity : AppCompatActivity() {
             Timestamp.now(),
             Timestamp.now()
         )
-        val adapter = ConversationAdaptor(arrayListOf(messageFrom, messageTo, messageFrom, messageFrom))
-        messagesRecyclerView.adapter = adapter
-        messagesRecyclerView.layoutManager = LinearLayoutManager(this)
+        val adapter = ConversationAdapter(arrayListOf(messageFrom, messageTo, messageFrom, messageFrom))
+        messages_recycler_view.adapter = adapter
+        messages_recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
 }

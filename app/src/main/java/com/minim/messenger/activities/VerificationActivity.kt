@@ -13,9 +13,9 @@ class VerificationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verification)
 
-        verifyButton.setOnClickListener {
+        verify_verification_code_button.setOnClickListener {
             val verificationId = intent.getStringExtra("verificationId")
-            val code = verificationCodeEditText.text.toString()
+            val code = verification_code_edit_text.text.toString()
             val credential = PhoneAuthProvider.getCredential(verificationId!!, code)
             SigningActivity.signIn(this@VerificationActivity, credential)
         }

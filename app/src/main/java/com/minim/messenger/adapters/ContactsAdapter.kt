@@ -1,4 +1,4 @@
-package com.minim.messenger.adaptors
+package com.minim.messenger.adapters
 
 import android.content.Context
 import android.content.Intent
@@ -14,8 +14,8 @@ import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationActivity
 import com.minim.messenger.models.User
 
-class ContactsAdaptor(private val context: Context, val contacts: ArrayList<User>) :
-    RecyclerView.Adapter<ContactsAdaptor.ContactHolder>(), Filterable {
+class ContactsAdapter(private val context: Context, val contacts: ArrayList<User>) :
+    RecyclerView.Adapter<ContactsAdapter.ContactHolder>(), Filterable {
 
     private var filteredContacts = contacts
 
@@ -25,9 +25,11 @@ class ContactsAdaptor(private val context: Context, val contacts: ArrayList<User
         ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false))
 
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
-        holder.contactUsername.text = filteredContacts[position].username
+        val contact = filteredContacts[position]
+        holder.contactUsername.text = contact.username
         holder.parentLayout.setOnClickListener {
             val intent = Intent(context, ConversationActivity::class.java)
+                .putExtra("contact", contact)
             context.startActivity(intent)
         }
     }
@@ -46,6 +48,7 @@ class ContactsAdaptor(private val context: Context, val contacts: ArrayList<User
                 return FilterResults().also { it.values = filteredList }
             }
 
+            @Suppress("UNCHECKED_CAST")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
                 filteredContacts = p1!!.values as ArrayList<User>
                 notifyDataSetChanged()
