@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ContactsAdapter
+import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.User
 import kotlinx.android.synthetic.main.activity_contacts.*
 
@@ -86,6 +87,12 @@ class ContactsActivity : AppCompatActivity() {
 
             val contactsDocRef = firestore.collection("contacts").document(currentUser.username!!)
             contactsDocRef.update("usernames", FieldValue.arrayUnion(contact.username!!))
+
+            // TODO : Add currentUser to contact's contacts
+
+            val conversation = Conversation(currentUser, contact)
+            val conversationDocRef = firestore.collection("conversations").document(conversation.id)
+            conversationDocRef.set(conversation.emptyDocument)
 
             adapter.contacts.add(contact)
             adapter.notifyDataSetChanged()
