@@ -5,12 +5,11 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 
 data class Message(
-    val id: String? = null,
     val sender: String? = null,
     val receiver: String? = null,
-    val type: Type? = null,
+    var type: Type? = null,
     val content: String? = null,
-    val isSeen: Boolean? = null,
+    val isRead: Boolean? = null,
     val duration: Long? = null,
     val sent: Timestamp? = null,
     val seen: Timestamp? = null
@@ -24,7 +23,6 @@ data class Message(
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
-        parcel.readString(),
         Type.values()[parcel.readInt()],
         parcel.readString(),
         parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
@@ -34,12 +32,11 @@ data class Message(
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
         parcel.writeString(sender)
         parcel.writeString(receiver)
         parcel.writeInt(type?.ordinal!!)
         parcel.writeString(content)
-        parcel.writeValue(isSeen)
+        parcel.writeValue(isRead)
         parcel.writeValue(duration)
         parcel.writeParcelable(sent, flags)
         parcel.writeParcelable(seen, flags)

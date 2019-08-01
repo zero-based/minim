@@ -10,8 +10,10 @@ import android.widget.Filterable
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
-import com.minim.messenger.activities.ContactsActivity
+import com.minim.messenger.activities.ContactsActivity.Companion.currentUser
 import com.minim.messenger.activities.ConversationActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
@@ -33,25 +35,42 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
         holder.contactUsername.text = contact.username
         holder.parentLayout.setOnClickListener {
 
-            // TODO : Remove this dummy variable
-            val message = Message(
-                type = Message.Type.FROM,
-                content = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z !"
-            )
+            val conversation = Conversation(currentUser, contact)
 
-            // TODO : Construct this variable dynamically
-            //   from database by fetching all the messages
-            val conversation = Conversation(
-                ContactsActivity.currentUser,
-                contact,
-                arrayListOf(message)
-            )
+            FirebaseFirestore.getInstance()
+                .collection("conversations")
+                .document(conversation.id)
+                .get().addOnCompleteListener {
+                    val messages = it.result!!["messages"] as ArrayList<HashMap<String, *>>
 
-            // TODO : Add intent & startActivity to onCompleteListener
-            val intent = Intent(context, ConversationActivity::class.java)
-            intent.putExtra("conversation", conversation)
-            context.startActivity(intent)
+                    for (messageMap in messages) {
+                        val message = Message(
+                            messageMap["sender"].toString(),
+                            messageMap["receiver"].toString(),
+                            Message.Type.valueOf(messageMap["type"].toString()),
+                            messageMap["content"].toString(),
+                            messageMap["read"]!! as Boolean,
+                            messageMap["duration"] as Long,
+                            messageMap["sent"] as Timestamp,
+                            messageMap["seen"] as Timestamp
+                        )
+                        conversation.messages!!.add(message)
+                    }
 
+                    if(!currentUser.username.equals(conversation.participant_1!!.username)){
+                        conversation.participant_1 = conversation.participant_2.also {
+                            conversation.participant_2 = conversation.participant_1
+                        }
+                    }
+                    conversation.messages!!.filter {
+                        it.sender == conversation.participant_2!!.username
+                    }.forEach {
+                        it.type = Message.Type.FROM
+                    }
+                    val intent = Intent(context, ConversationActivity::class.java)
+                    intent.putExtra("conversation", conversation)
+                    context.startActivity(intent)
+                }
         }
     }
 

@@ -3,9 +3,13 @@ package com.minim.messenger.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationAdapter
 import com.minim.messenger.models.Conversation
+import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation.*
 
 class ConversationActivity : AppCompatActivity() {
@@ -25,11 +29,28 @@ class ConversationActivity : AppCompatActivity() {
         initRecyclerView()
 
         send_button.setOnClickListener {
-            /* TODO : Construct message object from message_edit_text, then add:
-             *    1) The message to conversation local variable & notify the adaptor
-             *    2) The message document to Firestore messages collections
-             *    3) Message.id to conversation Firestore document
-             */
+
+            val message = Message(
+                conversation.participant_1!!.username,
+                conversation.participant_2!!.username,
+                Message.Type.TO,
+                message_edit_text.text.toString(),
+                false,
+                1440,
+                Timestamp.now(),
+                Timestamp.now()
+            )
+
+            adapter.messages.add(message)
+            adapter.notifyDataSetChanged()
+            message_edit_text.text.clear()
+
+            FirebaseFirestore.getInstance()
+                .collection("conversations")
+                .document(conversation.id)
+                .update("messages", FieldValue.arrayUnion(message)).addOnFailureListener {
+                    // TODO: Message not sent warning!
+                }
         }
     }
 
