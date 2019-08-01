@@ -7,20 +7,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.minim.messenger.R
 import com.minim.messenger.models.Message
-import com.minim.messenger.models.MessageType
 
 class ConversationAdaptor(private val messages: ArrayList<Message>) :
     RecyclerView.Adapter<ConversationAdaptor.MessageHolder>() {
 
     override fun getItemCount() = messages.size
 
-    override fun getItemViewType(position: Int) = messages[position].type.value
+    override fun getItemViewType(position: Int) = messages[position].type!!.ordinal
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
 
         val layoutType = when (viewType) {
-            MessageType.TO.value -> R.layout.item_message_from
-            MessageType.FROM.value -> R.layout.item_message_to
+            Message.Type.TO.ordinal   -> R.layout.item_message_from
+            Message.Type.FROM.ordinal -> R.layout.item_message_to
             else -> -1
         }
 

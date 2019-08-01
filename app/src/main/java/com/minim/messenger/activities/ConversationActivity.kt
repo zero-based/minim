@@ -8,14 +8,13 @@ import com.minim.messenger.adaptors.ConversationAdaptor
 import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation.*
 import com.google.firebase.Timestamp
-import com.minim.messenger.models.MessageType
 
 class ConversationActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
         initRecyclerView()
-
     }
 
     private fun initRecyclerView() {
@@ -24,7 +23,7 @@ class ConversationActivity : AppCompatActivity() {
             "12324",
             "1324",
             "1324",
-            MessageType.FROM,
+            Message.Type.FROM,
             content,
             true,
             3,
@@ -35,7 +34,7 @@ class ConversationActivity : AppCompatActivity() {
             "12324",
             "1324",
             "1324",
-            MessageType.TO,
+            Message.Type.TO,
             content,
             true,
             3,
