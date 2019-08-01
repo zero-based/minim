@@ -32,6 +32,8 @@ class ContactsActivity : AppCompatActivity() {
 
         initRecyclerView()
         fetchContacts()
+        initContactsListeners()
+        initConversationListeners()
 
         add_contact_button.setOnClickListener {
             if (SettingsActivity().isUsernameValid(this, search_edit_text)) {
@@ -124,6 +126,28 @@ class ContactsActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun initConversationListeners() {
+        for (i in 1..2) {
+            firestore.collection("conversations")
+                .whereEqualTo("participant_$i", currentUser.username)
+                .addSnapshotListener { value, e ->
+                    if (e != null) {
+                        return@addSnapshotListener
+                    }
+                    for (doc in value!!) {
+                        // TODO: Notify User
+                    }
+                }
+        }
+    }
+
+    private fun initContactsListeners() {
+        firestore.collection("contacts")
+            .document(currentUser.username!!).addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                //TODO: Add New Contacts
+            }
     }
 
     companion object {
