@@ -3,6 +3,7 @@ package com.minim.messenger.activities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -113,7 +114,11 @@ class ContactsActivity : AppCompatActivity() {
                     if (doc.exists()) {
                         val contact = doc.toObject(User::class.java)!!
                         adapter.contacts.add(contact)
-                        adapter.notifyItemInserted(i)
+                    }
+                }.addOnCompleteListener {
+                    if (i == usernames.lastIndex) {
+                        contacts_progress_bar.visibility = View.GONE
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }
