@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">minim</string>
     <string name="verify">Verify</string>
-    <string name="verificationCode">Verification Code</string>
-    <string name="phoneNumber">Phone Number</string>
-    <string name="sendSms">Send SMS</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="send_sms">Send SMS</string>
     <string name="username">username</string>
     <string name="save">Save</string>
-    <string name="message">message</string>
-    <string name="Search">search</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="search_or_add">Search or add contacts</string>
 </resources>

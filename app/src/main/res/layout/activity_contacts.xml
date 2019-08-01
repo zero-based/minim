@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/colorPrimaryDark"
-        android:padding="16dp"
-        android:focusableInTouchMode="true">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@color/colorPrimaryDark"
+              android:padding="16dp"
+              android:focusableInTouchMode="true">
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -16,7 +15,7 @@
               android:fontFamily="@font/typo_round_light"
               android:layout_gravity="center"/>
 
-    <LinearLayout android:id="@+id/linearLayout"
+    <LinearLayout android:id="@+id/input_linear_layout"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal"
@@ -24,38 +23,36 @@
                   android:layout_marginTop="16dp"
                   android:layout_marginBottom="24dp">
 
-        <EditText android:id="@+id/searchBoxEditText"
+        <EditText android:id="@+id/search_edit_text"
                   android:layout_width="0dp"
-                  android:layout_height="40dp"
+                  android:layout_height="wrap_content"
                   android:layout_weight="1"
-                  android:paddingStart="16dp"
-                  android:paddingEnd="16dp"
-                  android:hint="@string/Search"
+                  android:hint="@string/search_or_add"
                   android:textSize="16sp"
-                  android:maxLength="18"
+                  android:maxLength="@integer/username_max_length"
                   android:textColorHint="@android:color/tertiary_text_dark"
                   android:textColor="@android:color/white"
                   android:inputType="textShortMessage"
                   android:background="@drawable/rounded_container"/>
 
-        <ImageButton android:id="@+id/addButton"
+        <ImageButton android:id="@+id/add_contact_button"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:paddingLeft="4dp"
+                     android:layout_marginStart="8dp"
+                     android:layout_marginEnd="8dp"
                      android:src="@drawable/add_icon"
                      android:background="@android:color/transparent"/>
 
-        <ImageButton android:id="@+id/settingsButton"
+        <ImageButton android:id="@+id/settings_button"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:paddingLeft="4dp"
                      android:src="@drawable/settings_icon"
                      android:background="@android:color/transparent"/>
+
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/contactsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/contacts_recycler_view"
+                                               android:layout_width="match_parent"
+                                               android:layout_height="wrap_content"/>
 
 </LinearLayout>

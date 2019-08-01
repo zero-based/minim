@@ -17,9 +17,9 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        saveSettingsButton.setOnClickListener {
-            if (validateUsername(userNameEditText)) {
-                addUser(userNameEditText.text.toString())
+        settings_save_button.setOnClickListener {
+            if (isUsernameValid(this, username_edit_text)) {
+                addUser(username_edit_text.text.toString())
             }
         }
 
@@ -33,7 +33,7 @@ class SettingsActivity : AppCompatActivity() {
         userDocRef.get().addOnCompleteListener {
 
             if (it.result!!.exists()) {
-                userNameEditText.error = "@$username already in use. Try another."
+                username_edit_text.error = "@$username already in use. Try another."
                 return@addOnCompleteListener
             }
 
@@ -59,22 +59,20 @@ class SettingsActivity : AppCompatActivity() {
 
     }
 
-    companion object {
 
-        fun validateUsername(editText: EditText): Boolean {
-            when {
-                editText.text.isEmpty() -> editText.error =
-                    "Required field."
-                editText.text matches "[^a-zA-Z0-9]+".toRegex() -> editText.error =
-                    "Use only letters and numbers."
-                editText.text.length > 18 -> editText.error =
-                    "Use less than 18 characters."
-                else ->
-                    return true
-            }
-            return false
+    fun isUsernameValid(activity: AppCompatActivity, editText: EditText): Boolean {
+        val maxLength: Int = activity.resources.getInteger(R.integer.username_max_length)
+        when {
+            editText.text.isEmpty() -> editText.error =
+                "Required field."
+            editText.text matches "[^a-zA-Z0-9]+".toRegex() -> editText.error =
+                "Use only letters and numbers."
+            editText.text.length > maxLength -> editText.error =
+                "Use $maxLength characters or less."
+            else ->
+                return true
         }
-
+        return false
     }
 
 }
