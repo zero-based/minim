@@ -5,45 +5,35 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationAdapter
-import com.minim.messenger.models.Message
+import com.minim.messenger.models.Conversation
 import kotlinx.android.synthetic.main.activity_conversation.*
-import com.google.firebase.Timestamp
-import com.minim.messenger.models.User
 
 class ConversationActivity : AppCompatActivity() {
 
+    private lateinit var conversation: Conversation
+    private lateinit var adapter: ConversationAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
-        contact_username_text_view.text = intent.getParcelableExtra<User>("contact").username
+
+        conversation = intent.getParcelableExtra<Conversation>("conversation")!!
+        adapter = ConversationAdapter(conversation.messages!!)
+
+        contact_username_text_view.text = conversation.participant_2!!.username
         initRecyclerView()
+
+        send_button.setOnClickListener {
+            /* TODO : Construct message object from message_edit_text, then add:
+             *    1) The message to conversation local variable & notify the adaptor
+             *    2) The message document to Firestore messages collections
+             *    3) Message.id to conversation Firestore document
+             */
+        }
     }
 
     private fun initRecyclerView() {
-        val content = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z !"
-        val messageFrom = Message(
-            "12324",
-            "1324",
-            "1324",
-            Message.Type.FROM,
-            content,
-            true,
-            3,
-            Timestamp.now(),
-            Timestamp.now()
-        )
-        val messageTo = Message(
-            "12324",
-            "1324",
-            "1324",
-            Message.Type.TO,
-            content,
-            true,
-            3,
-            Timestamp.now(),
-            Timestamp.now()
-        )
-        val adapter = ConversationAdapter(arrayListOf(messageFrom, messageTo, messageFrom, messageFrom))
         messages_recycler_view.adapter = adapter
         messages_recycler_view.layoutManager = LinearLayoutManager(this)
     }

@@ -41,7 +41,7 @@
                      android:src="@drawable/attach_file_icon"
                      android:background="@android:color/transparent"/>
 
-        <EditText android:id="@+id/send_message_edit_text"
+        <EditText android:id="@+id/message_edit_text"
                   android:layout_width="0dp"
                   android:layout_height="wrap_content"
                   android:layout_weight="1"
