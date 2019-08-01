@@ -86,10 +86,13 @@ class ContactsActivity : AppCompatActivity() {
                 data["username"].toString()
             )
 
-            val contactsDocRef = firestore.collection("contacts").document(currentUser.username!!)
-            contactsDocRef.update("usernames", FieldValue.arrayUnion(contact.username!!))
+            firestore.collection("contacts")
+                .document(currentUser.username!!)
+                .update("usernames", FieldValue.arrayUnion(contact.username!!))
 
-            // TODO : Add currentUser to contact's contacts
+            firestore.collection("contacts")
+                .document(contact.username)
+                .update("usernames", FieldValue.arrayUnion(currentUser.username!!))
 
             val conversation = Conversation(currentUser, contact)
             val conversationDocRef = firestore.collection("conversations").document(conversation.id)
@@ -121,6 +124,7 @@ class ContactsActivity : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 }
+
             }
         }
 
