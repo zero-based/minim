@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Conversation(
-    val participant_1: User? = null,
-    val participant_2: User? = null,
+    var participant_1: User? = null,
+    var participant_2: User? = null,
     val messages: ArrayList<Message>? = arrayListOf()
 ) : Parcelable {
 
@@ -25,7 +25,7 @@ data class Conversation(
         "id" to id,
         "participant_1" to participant_1!!.username,
         "participant_2" to participant_2!!.username,
-        "messages" to arrayListOf<String>()
+        "messages" to arrayListOf<Message>()
     )
 
     constructor(parcel: Parcel) : this(
