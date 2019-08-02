@@ -5,10 +5,8 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
@@ -33,8 +31,13 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
 
         val contact = filteredContacts[position]
         holder.contactUsername.text = contact.username
+        if(contact.hasChanges!!){
+            holder.hasChanges.visibility = View.VISIBLE
+        }
         holder.parentLayout.setOnClickListener {
 
+            holder.hasChanges.visibility = View.GONE
+            contact.hasChanges           = false
             val conversation = Conversation(arrayListOf(currentUser, contact))
 
             FirebaseFirestore.getInstance()
@@ -82,6 +85,7 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
 
     inner class ContactHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal var contactUsername: TextView = itemView.findViewById(R.id.contactUsername)
+        internal var hasChanges: ImageView = itemView.findViewById(R.id.notification_blink)
         internal var parentLayout: LinearLayout = itemView.findViewById(R.id.contactLinearLayout)
     }
 

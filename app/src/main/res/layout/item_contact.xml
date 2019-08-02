@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/contactLinearLayout"
-              android:orientation="vertical"
+              android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:padding="8dp">
+              android:padding="8dp"
+              android:gravity="center">
 
     <TextView android:id="@+id/contactUsername"
-              android:layout_width="match_parent"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_weight="1"
               android:textSize="18sp"
               android:textColor="@android:color/white"
               android:letterSpacing="0.25"/>
+
+    <ImageView android:id="@+id/notification_blink"
+               android:layout_width="8dp"
+               android:layout_height="8dp"
+               android:visibility="invisible"
+               android:background="@drawable/notification_blink"/>
 
 </LinearLayout>
