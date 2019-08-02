@@ -27,6 +27,7 @@ class ConversationActivity : AppCompatActivity() {
 
         contact_username_text_view.text = conversation.participant_2!!.username
         initRecyclerView()
+        initMessagesListeners(conversation.id)
 
         send_button.setOnClickListener {
 
@@ -57,6 +58,14 @@ class ConversationActivity : AppCompatActivity() {
     private fun initRecyclerView() {
         messages_recycler_view.adapter = adapter
         messages_recycler_view.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun initMessagesListeners(conversationId: String) {
+        FirebaseFirestore.getInstance().collection("conversations")
+            .document(conversationId)
+            .addSnapshotListener { snapshot, firestoreException ->
+                // TODO: Reload messages
+            }
     }
 
 }
