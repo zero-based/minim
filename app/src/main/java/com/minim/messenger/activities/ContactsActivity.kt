@@ -5,8 +5,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ContactsAdapter
@@ -30,7 +32,6 @@ class ContactsActivity : AppCompatActivity() {
         currentUser = User(authUser.uid, authUser.phoneNumber, authUser.displayName)
 
         initRecyclerView()
-        fetchContacts()
         initConversationListeners()
 
         add_contact_button.setOnClickListener {
@@ -53,6 +54,24 @@ class ContactsActivity : AppCompatActivity() {
         adapter = ContactsAdapter(this, contacts)
         contacts_recycler_view.adapter = adapter
         contacts_recycler_view.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun initConversationListeners() {
+        firestore.collection("conversations")
+            .whereArrayContains("participants", currentUser.username!!)
+            .addSnapshotListener { querySnapshot, _ ->
+
+                for (dc in querySnapshot!!.documentChanges) {
+                    if (dc.type == DocumentChange.Type.ADDED) {
+                        fetchContacts(querySnapshot.documentChanges)
+                        return@addSnapshotListener
+                    } else if (dc.type == DocumentChange.Type.MODIFIED) {
+                        newMessageNotification(querySnapshot.documentChanges.last())
+                    } else if (dc.type == DocumentChange.Type.REMOVED) {
+                        TODO()
+                    }
+                }
+            }
     }
 
     private fun contactExists(username: String): Boolean {
@@ -91,49 +110,45 @@ class ContactsActivity : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun fetchContacts() {
-        firestore.collection("conversations")
-            .whereArrayContains("participants", currentUser.username!!)
-            .get()
-            .addOnSuccessListener { documents ->
+    private fun fetchContacts(documentChanges: List<DocumentChange>) {
+        documentChanges.filter {
+            it.type == DocumentChange.Type.ADDED
+        }
 
-                if (documents.size() == 0) {
+        if (documentChanges.isEmpty()) {
+            contacts_progress_bar.visibility = View.GONE
+        }
+        for (documentChange in documentChanges) {
+
+            val participants = documentChange.document["participants"] as ArrayList<String>
+            val contactUsername = participants.find { it != currentUser.username }!!
+
+            firestore.collection("users")
+                .document(contactUsername)
+                .get()
+                .addOnSuccessListener {
+                    val contact = it.toObject(User::class.java)!!
+                    adapter.contacts.add(contact)
+                }.addOnCompleteListener {
                     contacts_progress_bar.visibility = View.GONE
+                    adapter.notifyDataSetChanged()
                 }
 
-                for ((i, document) in documents.withIndex()) {
-
-                    val participants = document.data["participants"] as ArrayList<String>
-                    val contactUsername = participants.find { it != currentUser.username }!!
-
-                    firestore.collection("users")
-                        .document(contactUsername)
-                        .get()
-                        .addOnSuccessListener {
-                            val contact = it.toObject(User::class.java)!!
-                            adapter.contacts.add(contact)
-                        }.addOnCompleteListener {
-                            if (i == documents.size() - 1) {
-                                contacts_progress_bar.visibility = View.GONE
-                                adapter.notifyDataSetChanged()
-                            }
-                        }
-
-                }
-            }
+        }
     }
 
-    private fun initConversationListeners() {
-        firestore.collection("conversations")
-            .whereArrayContains("participants", currentUser.username!!)
-            .addSnapshotListener { value, e ->
-                if (e != null) {
-                    return@addSnapshotListener
-                }
-                for (doc in value!!) {
-                    // TODO: Notify User
-                }
+    @Suppress("UNCHECKED_CAST")
+    private fun newMessageNotification(documentChange: DocumentChange) {
+        val participants = documentChange.document["participants"] as ArrayList<String>
+        val contactUsername = participants.find { it != currentUser.username }!!
+
+        adapter.contacts.forEachIndexed { i, user ->
+            if (user.username == contactUsername) {
+                adapter.contacts[i].hasChanges = true
+                adapter.notifyItemChanged(i)
+                return@forEachIndexed
             }
+        }
     }
 
     companion object {

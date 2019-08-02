@@ -9,6 +9,8 @@ data class User(
     val username: String? = null
 ) : Parcelable {
 
+    var hasChanges: Boolean? = false
+
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
