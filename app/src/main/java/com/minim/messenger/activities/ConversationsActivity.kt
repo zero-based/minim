@@ -1,11 +1,15 @@
 package com.minim.messenger.activities
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
@@ -13,8 +17,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.models.Conversation
+import com.minim.messenger.models.Message
 import com.minim.messenger.models.User
 import kotlinx.android.synthetic.main.activity_conversations.*
+
 
 class ConversationsActivity : AppCompatActivity() {
 
@@ -142,16 +148,37 @@ class ConversationsActivity : AppCompatActivity() {
 
     @Suppress("UNCHECKED_CAST")
     private fun newMessageNotification(documentChange: DocumentChange) {
-        val participants = documentChange.document["participants"] as ArrayList<String>
-        val contactUsername = participants.find { it != currentUser.username }!!
 
-        adapter.conversations.forEachIndexed { i, conversation ->
-            if (conversation.other.username == contactUsername) {
-                adapter.conversations[i].hasChanges = true
-                adapter.notifyItemChanged(i)
-                return@forEachIndexed
-            }
+        val messages = documentChange.document["messages"] as ArrayList<HashMap<String, *>>
+        val message = Message(messages.last())
+
+        if (message.sender == currentUser.username) {
+            return
         }
+
+        val id = documentChange.document["id"].toString()
+        val index = adapter.conversations.indexOfFirst { it.id == id }
+        adapter.conversations[index].hasChanges = true
+        adapter.notifyItemChanged(index)
+        pushNotification(message, index)
+    }
+
+    private fun pushNotification(message: Message, index: Int) {
+        val intent = Intent(this, ConversationsActivity::class.java)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+        val builder = NotificationCompat.Builder(this)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(message.sender)
+            .setContentText(message.content)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setSound(alarmSound)
+            .build()
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(index, builder)
     }
 
     override fun onResume() {
