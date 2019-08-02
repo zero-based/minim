@@ -18,14 +18,14 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         settings_save_button.setOnClickListener {
-            if (isUsernameValid(this, username_edit_text)) {
-                addUser(username_edit_text.text.toString())
+            if (isUsernameValid(this, username_edit_text) && isEmailValid(email_edit_text)) {
+                addUser(username_edit_text.text.toString(), email_edit_text.text.toString())
             }
         }
 
     }
 
-    private fun addUser(username: String) {
+    private fun addUser(username: String, email: String) {
 
         val firestore = FirebaseFirestore.getInstance()
         val userDocRef = firestore.collection("users").document(username)
@@ -37,31 +37,23 @@ class SettingsActivity : AppCompatActivity() {
                 return@addOnCompleteListener
             }
 
-            // Set user's display name
+            val authUser = FirebaseAuth.getInstance().currentUser
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName(username)
                 .build()
-            val authUser = FirebaseAuth.getInstance().currentUser
-            authUser?.updateProfile(profileUpdates)
-
-            // Add user document
-            val user = User(authUser?.uid, authUser?.phoneNumber!!, username)
-            userDocRef.set(user).addOnCompleteListener {
-                // Add contacts document
-                val contactsDocRef = firestore.collection("contacts").document(username)
-                val usernames = hashMapOf("usernames" to arrayListOf<String>())
-                contactsDocRef.set(usernames).addOnCompleteListener {
-                    SigningActivity.startActivity(this, ContactsActivity::class.java)
+            authUser?.updateProfile(profileUpdates)?.addOnCompleteListener {
+                authUser.updateEmail(email).addOnCompleteListener {
+                    userDocRef.set(User(authUser)).addOnCompleteListener {
+                        SigningActivity.startActivity(this, ContactsActivity::class.java)
+                    }
                 }
             }
-
         }
 
     }
 
-
     fun isUsernameValid(activity: AppCompatActivity, editText: EditText): Boolean {
-        val maxLength: Int = activity.resources.getInteger(R.integer.username_max_length)
+        val maxLength = activity.resources.getInteger(R.integer.username_max_length)
         when {
             editText.text.isEmpty() -> editText.error =
                 "Required field."
@@ -73,6 +65,14 @@ class SettingsActivity : AppCompatActivity() {
                 return true
         }
         return false
+    }
+
+    private fun isEmailValid(editText: EditText): Boolean {
+        if (editText.text.isEmpty()) {
+            editText.error = "Required field."
+            return false
+        }
+        return true
     }
 
 }
