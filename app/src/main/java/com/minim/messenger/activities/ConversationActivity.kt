@@ -43,6 +43,7 @@ class ConversationActivity : AppCompatActivity() {
             )
 
             adapter.messages.add(message)
+            messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
             adapter.notifyDataSetChanged()
             message_edit_text.text.clear()
 
@@ -57,7 +58,9 @@ class ConversationActivity : AppCompatActivity() {
 
     private fun initRecyclerView() {
         messages_recycler_view.adapter = adapter
-        messages_recycler_view.layoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.stackFromEnd = true
+        messages_recycler_view.layoutManager = linearLayoutManager
     }
 
     private fun initMessagesListeners(conversationId: String) {
