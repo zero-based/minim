@@ -11,8 +11,6 @@ data class User(
     val email: String? = null
 ) : Parcelable {
 
-    var hasChanges: Boolean? = false
-
     constructor(user: FirebaseUser) : this(
         user.uid,
         user.displayName,

@@ -6,39 +6,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
-import com.minim.messenger.activities.ContactsActivity.Companion.currentUser
-import com.minim.messenger.activities.ConversationActivity
+import com.minim.messenger.activities.ConversationLogActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
-import com.minim.messenger.models.User
 
-class ContactsAdapter(private val context: Context, val contacts: ArrayList<User>) :
-    RecyclerView.Adapter<ContactsAdapter.ContactHolder>(), Filterable {
+class ConversationsAdapter(private val context: Context, val conversations: ArrayList<Conversation>) :
+    RecyclerView.Adapter<ConversationsAdapter.ContactHolder>(), Filterable {
 
-    private var filteredContacts = contacts
+    private var filteredConversations = conversations
 
-    override fun getItemCount() = filteredContacts.size
+    override fun getItemCount() = filteredConversations.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false))
+        ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false))
 
     @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
 
-        val contact = filteredContacts[position]
-        holder.contactUsername.text = contact.username
-        if(contact.hasChanges!!){
+        val conversation = filteredConversations[position]
+        holder.otherUsername.text = conversation.other.username
+
+        if (conversation.hasChanges!!) {
             holder.hasChanges.visibility = View.VISIBLE
         }
         holder.parentLayout.setOnClickListener {
 
             holder.hasChanges.visibility = View.GONE
-            contact.hasChanges           = false
-            val conversation = Conversation(arrayListOf(currentUser, contact))
+            conversation.hasChanges = false
 
             FirebaseFirestore.getInstance()
                 .collection("conversations")
@@ -52,7 +49,7 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
 
                     conversation.processMessages()
 
-                    val intent = Intent(context, ConversationActivity::class.java)
+                    val intent = Intent(context, ConversationLogActivity::class.java)
                     intent.putExtra("conversation", conversation)
                     context.startActivity(intent)
                 }
@@ -66,16 +63,16 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
             override fun performFiltering(p0: CharSequence?): FilterResults {
                 val query = p0.toString()
                 val filteredList = if (query.isNotEmpty()) {
-                    contacts.filter { it.username?.contains(query, true)!! } as ArrayList<User>
+                    conversations.filter { it.other.username?.contains(query, true)!! } as ArrayList<Conversation>
                 } else {
-                    contacts
+                    conversations
                 }
                 return FilterResults().also { it.values = filteredList }
             }
 
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
-                filteredContacts = p1!!.values as ArrayList<User>
+                filteredConversations = p1!!.values as ArrayList<Conversation>
                 notifyDataSetChanged()
             }
 
@@ -84,9 +81,9 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
     }
 
     inner class ContactHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal var contactUsername: TextView = itemView.findViewById(R.id.contactUsername)
+        internal var otherUsername: TextView = itemView.findViewById(R.id.other_username)
         internal var hasChanges: ImageView = itemView.findViewById(R.id.notification_blink)
-        internal var parentLayout: LinearLayout = itemView.findViewById(R.id.contactLinearLayout)
+        internal var parentLayout: LinearLayout = itemView.findViewById(R.id.contact_linear_layout)
     }
 
 }

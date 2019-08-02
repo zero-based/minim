@@ -17,8 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.VerificationActivity"/>
-        <activity android:name=".activities.ContactsActivity"/>
+        <activity android:name=".activities.ConversationsActivity"/>
         <activity android:name=".activities.SettingsActivity"/>
-        <activity android:name=".activities.ConversationActivity"/>
+        <activity android:name=".activities.ConversationLogActivity"/>
     </application>
 </manifest>

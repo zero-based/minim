@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/contactLinearLayout"
+              android:id="@+id/contact_linear_layout"
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:padding="8dp"
               android:gravity="center">
 
-    <TextView android:id="@+id/contactUsername"
-              android:layout_width="wrap_content"
+    <TextView android:id="@+id/other_username"
+              android:layout_width="0dp"
               android:layout_height="wrap_content"
               android:layout_weight="1"
               android:textSize="18sp"

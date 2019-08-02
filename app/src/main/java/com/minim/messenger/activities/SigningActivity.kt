@@ -20,7 +20,7 @@ class SigningActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         FirebaseAuth.getInstance().currentUser ?: return
-        startActivity(this, ContactsActivity::class.java)
+        startActivity(this, ConversationsActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +74,7 @@ class SigningActivity : AppCompatActivity() {
                 val destination = if (isNewUser) {
                     SettingsActivity::class.java
                 } else {
-                    ContactsActivity::class.java
+                    ConversationsActivity::class.java
                 }
                 startActivity(context, destination)
             }
