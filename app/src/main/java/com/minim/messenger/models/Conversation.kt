@@ -4,41 +4,49 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Conversation(
-    var participant_1: User? = null,
-    var participant_2: User? = null,
-    val messages: ArrayList<Message>? = arrayListOf()
+    val participants: ArrayList<User> = arrayListOf(),
+    val messages: ArrayList<Message> = arrayListOf()
 ) : Parcelable {
 
-    var id = generateID()
+    val id = generateId()
 
-    private fun generateID(): String {
-        val firstUsername = participant_1!!.username!!
-        val secondUsername = participant_2!!.username!!
-        return if (firstUsername < secondUsername) {
-            "$firstUsername:$secondUsername"
-        } else {
-            "$secondUsername:$firstUsername"
+    val document = hashMapOf<String, Any>(
+        "participants" to arrayListOf<String>().also {
+            participants.forEach { p -> it.add(p.username.toString()) }
+        },
+        "messages" to messages
+    )
+
+    private fun generateId(): String {
+        return arrayListOf<String>().also {
+            participants.sortedBy { user ->
+                user.username
+            }.forEach { user ->
+                it.add(user.username.toString())
+            }
+        }.joinToString(":")
+    }
+
+    fun processMessages() {
+        val other = participants[1]
+        messages.filter { m ->
+            m.sender == other.username
+        }.forEach { m ->
+            m.type = Message.Type.FROM
         }
     }
 
-    val emptyDocument = hashMapOf(
-        "id" to id,
-        "participant_1" to participant_1!!.username,
-        "participant_2" to participant_2!!.username,
-        "messages" to arrayListOf<Message>()
-    )
-
     constructor(parcel: Parcel) : this(
-        parcel.readParcelable(User::class.java.classLoader),
-        parcel.readParcelable(User::class.java.classLoader),
+        arrayListOf<User>().apply {
+            parcel.readList(this as List<*>, User::class.java.classLoader)
+        },
         arrayListOf<Message>().apply {
             parcel.readList(this as List<*>, Message::class.java.classLoader)
         }
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(participant_1, flags)
-        parcel.writeParcelable(participant_2, flags)
+        parcel.writeList(participants as List<*>?)
         parcel.writeList(messages as List<*>?)
     }
 

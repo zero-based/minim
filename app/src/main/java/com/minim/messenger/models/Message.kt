@@ -20,6 +20,17 @@ data class Message(
         FROM
     }
 
+    constructor(hashMap: HashMap<*, *>) : this(
+        hashMap["sender"].toString(),
+        hashMap["receiver"].toString(),
+        Type.valueOf(hashMap["type"].toString()),
+        hashMap["content"].toString(),
+        hashMap["read"] as Boolean,
+        hashMap["duration"] as Long,
+        hashMap["sent"] as Timestamp,
+        hashMap["seen"] as Timestamp
+    )
+
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),

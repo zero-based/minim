@@ -23,17 +23,17 @@ class ConversationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_conversation)
 
         conversation = intent.getParcelableExtra<Conversation>("conversation")!!
-        adapter = ConversationAdapter(conversation.messages!!)
+        adapter = ConversationAdapter(conversation.messages)
 
-        contact_username_text_view.text = conversation.participant_2!!.username
+        contact_username_text_view.text = conversation.participants[1].username
         initRecyclerView()
         initMessagesListeners(conversation.id)
 
         send_button.setOnClickListener {
 
             val message = Message(
-                conversation.participant_1!!.username,
-                conversation.participant_2!!.username,
+                conversation.participants[0].username,
+                conversation.participants[1].username,
                 Message.Type.TO,
                 message_edit_text.text.toString(),
                 false,
