@@ -18,7 +18,6 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.net.Uri
 
-
 class ConversationLogActivity : AppCompatActivity() {
 
     private lateinit var conversation: Conversation
@@ -33,19 +32,18 @@ class ConversationLogActivity : AppCompatActivity() {
         conversation = intent.getParcelableExtra<Conversation>("conversation")!!
         adapter = MessagesAdapter(conversation.messages)
 
-        contact_username_text_view.text = conversation.participants[1].username
+        contact_username_text_view.text = conversation.other.username
         initRecyclerView()
         initConversationListener(conversation.id)
 
         attach_button.setOnClickListener {
-            val sender = conversation.participants[0]
-            val receiver = conversation.participants[1]
             val emailIntent = Intent(
                 Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", "${receiver.email}", null
+                    "mailto", "${conversation.other.email}", null
                 )
             )
-            val subject = "[${R.string.app_name}] Attachment from ${sender.username}"
+            val appName = resources.getString(R.string.app_name)
+            val subject = "[$appName] Attachment from ${conversation.user.username}"
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
             startActivity(Intent.createChooser(emailIntent, "Send email..."))
         }
@@ -57,8 +55,8 @@ class ConversationLogActivity : AppCompatActivity() {
             }
 
             val message = Message(
-                conversation.participants[0].username,
-                conversation.participants[1].username,
+                conversation.user.username,
+                conversation.other.username,
                 Message.Type.TO,
                 message_edit_text.text.toString(),
                 false,
@@ -103,7 +101,7 @@ class ConversationLogActivity : AppCompatActivity() {
     private fun fetchNewMessage(messages: Any?) {
         messages as ArrayList<HashMap<String, *>>
         val message = Message(messages[messages.lastIndex])
-        if (message.sender == conversation.participants[0].username) {
+        if (message.sender == conversation.user.username) {
             return
         }
         message.type = Message.Type.FROM
@@ -116,4 +114,5 @@ class ConversationLogActivity : AppCompatActivity() {
         super.onBackPressed()
         registrationListener.remove()
     }
+
 }

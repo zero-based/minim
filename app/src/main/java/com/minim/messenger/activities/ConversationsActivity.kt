@@ -18,10 +18,11 @@ import kotlinx.android.synthetic.main.activity_conversations.*
 
 class ConversationsActivity : AppCompatActivity() {
 
-    private lateinit var adapter: ConversationsAdapter
-    private var conversations = arrayListOf<Conversation>()
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    private lateinit var currentUser: User
+    private lateinit var adapter: ConversationsAdapter
+    private var conversations = arrayListOf<Conversation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -64,7 +65,11 @@ class ConversationsActivity : AppCompatActivity() {
             .whereArrayContains("participants", currentUser.username!!)
             .addSnapshotListener { querySnapshot, _ ->
 
-                for (dc in querySnapshot!!.documentChanges) {
+                if (querySnapshot!!.isEmpty) {
+                    contacts_progress_bar.visibility = View.GONE
+                }
+
+                for (dc in querySnapshot.documentChanges) {
                     if (dc.type == DocumentChange.Type.ADDED) {
                         fetchContacts(querySnapshot.documentChanges)
                         return@addSnapshotListener
@@ -105,8 +110,6 @@ class ConversationsActivity : AppCompatActivity() {
             val conversation = Conversation(arrayListOf(currentUser, contact))
             firestore.collection("conversations").document(conversation.id).set(conversation.document)
 
-            adapter.conversations.add(conversation)
-            adapter.notifyDataSetChanged()
         }
 
     }
@@ -115,10 +118,6 @@ class ConversationsActivity : AppCompatActivity() {
     private fun fetchContacts(documentChanges: List<DocumentChange>) {
         documentChanges.filter {
             it.type == DocumentChange.Type.ADDED
-        }
-
-        if (documentChanges.isEmpty()) {
-            contacts_progress_bar.visibility = View.GONE
         }
 
         for (documentChange in documentChanges) {
@@ -155,8 +154,20 @@ class ConversationsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (currentConversationIndex == -1) return
+        conversations[currentConversationIndex].hasChanges = false
+        adapter.notifyItemChanged(currentConversationIndex)
+    }
+
+    override fun finish() {
+        super.finish()
+        currentConversationIndex = -1
+    }
+
     companion object {
-        lateinit var currentUser: User
+        var currentConversationIndex = -1
     }
 
 }
