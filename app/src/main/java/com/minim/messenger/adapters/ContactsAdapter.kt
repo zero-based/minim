@@ -10,7 +10,6 @@ import android.widget.Filterable
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.activities.ContactsActivity.Companion.currentUser
@@ -29,44 +28,27 @@ class ContactsAdapter(private val context: Context, val contacts: ArrayList<User
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false))
 
+    @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
 
         val contact = filteredContacts[position]
         holder.contactUsername.text = contact.username
         holder.parentLayout.setOnClickListener {
 
-            val conversation = Conversation(currentUser, contact)
+            val conversation = Conversation(arrayListOf(currentUser, contact))
 
             FirebaseFirestore.getInstance()
                 .collection("conversations")
                 .document(conversation.id)
                 .get().addOnCompleteListener {
+
                     val messages = it.result!!["messages"] as ArrayList<HashMap<String, *>>
-
-                    for (messageMap in messages) {
-                        val message = Message(
-                            messageMap["sender"].toString(),
-                            messageMap["receiver"].toString(),
-                            Message.Type.valueOf(messageMap["type"].toString()),
-                            messageMap["content"].toString(),
-                            messageMap["read"]!! as Boolean,
-                            messageMap["duration"] as Long,
-                            messageMap["sent"] as Timestamp,
-                            messageMap["seen"] as Timestamp
-                        )
-                        conversation.messages!!.add(message)
+                    messages.forEach { m ->
+                        conversation.messages.add(Message(m))
                     }
 
-                    if(!currentUser.username.equals(conversation.participant_1!!.username)){
-                        conversation.participant_1 = conversation.participant_2.also {
-                            conversation.participant_2 = conversation.participant_1
-                        }
-                    }
-                    conversation.messages!!.filter {
-                        it.sender == conversation.participant_2!!.username
-                    }.forEach {
-                        it.type = Message.Type.FROM
-                    }
+                    conversation.processMessages()
+
                     val intent = Intent(context, ConversationActivity::class.java)
                     intent.putExtra("conversation", conversation)
                     context.startActivity(intent)

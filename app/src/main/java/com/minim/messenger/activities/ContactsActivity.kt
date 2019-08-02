@@ -7,7 +7,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ContactsAdapter
@@ -32,7 +31,6 @@ class ContactsActivity : AppCompatActivity() {
 
         initRecyclerView()
         fetchContacts()
-        initContactsListeners()
         initConversationListeners()
 
         add_contact_button.setOnClickListener {
@@ -72,8 +70,8 @@ class ContactsActivity : AppCompatActivity() {
         val docRef = firestore.collection("users").document(username)
         docRef.get().addOnCompleteListener {
 
-            val result = it.result!!
-            if (!result.exists()) {
+            val doc = it.result!!
+            if (!doc.exists()) {
                 search_edit_text.error = "User not found"
                 return@addOnCompleteListener
             }
@@ -81,24 +79,9 @@ class ContactsActivity : AppCompatActivity() {
             search_edit_text.text.clear()
             search_edit_text.clearFocus()
 
-            val data = result.data!!
-            val contact = User(
-                data["uid"].toString(),
-                data["phoneNumber"].toString(),
-                data["username"].toString()
-            )
-
-            firestore.collection("contacts")
-                .document(currentUser.username!!)
-                .update("usernames", FieldValue.arrayUnion(contact.username!!))
-
-            firestore.collection("contacts")
-                .document(contact.username)
-                .update("usernames", FieldValue.arrayUnion(currentUser.username!!))
-
-            val conversation = Conversation(currentUser, contact)
-            val conversationDocRef = firestore.collection("conversations").document(conversation.id)
-            conversationDocRef.set(conversation.emptyDocument)
+            val contact = doc.toObject(User::class.java)!!
+            val conversation = Conversation(arrayListOf(currentUser, contact))
+            firestore.collection("conversations").document(conversation.id).set(conversation.document)
 
             adapter.contacts.add(contact)
             adapter.notifyDataSetChanged()
@@ -109,48 +92,47 @@ class ContactsActivity : AppCompatActivity() {
 
     @Suppress("UNCHECKED_CAST")
     private fun fetchContacts() {
+        firestore.collection("conversations")
+            .whereArrayContains("participants", currentUser.username!!)
+            .get()
+            .addOnSuccessListener { documents ->
 
-        val contactsDocRef = firestore.collection("contacts").document(currentUser.username!!)
-        contactsDocRef.get().addOnSuccessListener {
-            val usernames = it.data!!["usernames"] as ArrayList<String>
-            for ((i, username) in usernames.withIndex()) {
-                val docRef = firestore.collection("users").document(username)
-                docRef.get().addOnSuccessListener { doc ->
-                    if (doc.exists()) {
-                        val contact = doc.toObject(User::class.java)!!
-                        adapter.contacts.add(contact)
-                    }
-                }.addOnCompleteListener {
-                    if (i == usernames.lastIndex) {
-                        contacts_progress_bar.visibility = View.GONE
-                        adapter.notifyDataSetChanged()
-                    }
+                if (documents.size() == 0) {
+                    contacts_progress_bar.visibility = View.GONE
                 }
 
-            }
-        }
+                for ((i, document) in documents.withIndex()) {
 
+                    val participants = document.data["participants"] as ArrayList<String>
+                    val contactUsername = participants.find { it != currentUser.username }!!
+
+                    firestore.collection("users")
+                        .document(contactUsername)
+                        .get()
+                        .addOnSuccessListener {
+                            val contact = it.toObject(User::class.java)!!
+                            adapter.contacts.add(contact)
+                        }.addOnCompleteListener {
+                            if (i == documents.size() - 1) {
+                                contacts_progress_bar.visibility = View.GONE
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+
+                }
+            }
     }
 
     private fun initConversationListeners() {
-        for (i in 1..2) {
-            firestore.collection("conversations")
-                .whereEqualTo("participant_$i", currentUser.username)
-                .addSnapshotListener { value, e ->
-                    if (e != null) {
-                        return@addSnapshotListener
-                    }
-                    for (doc in value!!) {
-                        // TODO: Notify User
-                    }
+        firestore.collection("conversations")
+            .whereArrayContains("participants", currentUser.username!!)
+            .addSnapshotListener { value, e ->
+                if (e != null) {
+                    return@addSnapshotListener
                 }
-        }
-    }
-
-    private fun initContactsListeners() {
-        firestore.collection("contacts")
-            .document(currentUser.username!!).addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-                //TODO: Add New Contacts
+                for (doc in value!!) {
+                    // TODO: Notify User
+                }
             }
     }
 
