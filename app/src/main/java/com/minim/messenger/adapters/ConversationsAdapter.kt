@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationLogActivity
@@ -40,29 +40,56 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         }
 
         holder.parentLayout.setOnClickListener {
+            val firestore = FirebaseFirestore.getInstance()
 
-            FirebaseFirestore.getInstance()
-                .collection("conversations")
-                .document(conversation.id)
-                .get().addOnCompleteListener {
+            val docRef = firestore.collection("conversations").document(conversation.id)
 
-                    val messages = it.result!!["messages"] as ArrayList<HashMap<String, *>>
-                    messages.forEach { m ->
-                        conversation.messages.add(Message(m))
-                    }
+            docRef.get().addOnCompleteListener {
 
-                    conversation.processMessages()
-                    ConversationsActivity.currentConversationIndex = position
-                    holder.hasChanges.visibility = View.GONE
-
-                    val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.cancel(position)
-
-                    val intent = Intent(context, ConversationLogActivity::class.java)
-                    intent.putExtra("conversation", conversation)
-                    context.startActivity(intent)
+                val messagesIds = it.result!!["messages"] as ArrayList<String>
+                if (messagesIds.isEmpty()) {
+                    startConversation(conversation)
+                    return@addOnCompleteListener
                 }
+                for ((i, id) in messagesIds.withIndex()) {
+                    firestore.collection("messages").document(id)
+                        .get().addOnSuccessListener { doc ->
+                            conversation.messages.add(doc.toObject(Message::class.java)!!)
+                        }.addOnCompleteListener {
+                            if (i == messagesIds.lastIndex) {
+                                val unseenMessages = conversation.getOtherUnseenMessages()
+                                unseenMessages.forEach { m ->
+                                    m.seen = true
+                                    m.seenOn = Timestamp.now()
+                                    firestore.collection("messages")
+                                        .document(m.id!!)
+                                        .set(m)
+                                }
+                                conversation.markSeenMessages()
+                                conversation.processMessages()
+                                dismissExistingNotification(holder, position)
+                                startConversation(conversation)
+                            }
+                        }
+                }
+            }
+
         }
+    }
+
+    private fun startConversation(conversation: Conversation) {
+        val intent = Intent(context, ConversationLogActivity::class.java)
+        intent.putExtra("conversation", conversation)
+        context.startActivity(intent)
+    }
+
+    private fun dismissExistingNotification(holder: ContactHolder, position: Int) {
+        ConversationsActivity.currentConversationIndex = position
+        holder.hasChanges.visibility = View.GONE
+
+        val notificationManager =
+            context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(position)
     }
 
     override fun getFilter(): Filter {

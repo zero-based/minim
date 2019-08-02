@@ -2,6 +2,7 @@ package com.minim.messenger.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.firebase.Timestamp
 
 data class Conversation(
     val participants: ArrayList<User> = arrayListOf(),
@@ -18,7 +19,9 @@ data class Conversation(
         "participants" to arrayListOf<String>().also {
             participants.forEach { p -> it.add(p.username.toString()) }
         },
-        "messages" to messages
+        "messages" to arrayListOf<String>().also {
+            messages.forEach { m -> it.add(m.id.toString()) }
+        }
     )
 
     private fun generateId(): String {
@@ -37,6 +40,19 @@ data class Conversation(
             m.sender == other.username
         }.forEach { m ->
             m.type = Message.Type.FROM
+        }
+    }
+
+    fun getOtherUnseenMessages(): List<Message> {
+        return messages.filter {
+            it.sender == other.username && it.seen == false
+        }
+    }
+
+    fun markSeenMessages() {
+        getOtherUnseenMessages().forEach {
+            it.seen = true
+            it.seenOn = Timestamp.now()
         }
     }
 
