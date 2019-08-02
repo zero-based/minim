@@ -4,18 +4,24 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation.*
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ConversationActivity : AppCompatActivity() {
 
     private lateinit var conversation: Conversation
     private lateinit var adapter: ConversationAdapter
+    private lateinit var registrationListener: ListenerRegistration
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -27,9 +33,13 @@ class ConversationActivity : AppCompatActivity() {
 
         contact_username_text_view.text = conversation.participants[1].username
         initRecyclerView()
-        initMessagesListeners(conversation.id)
+        initConversationListener(conversation.id)
 
         send_button.setOnClickListener {
+
+            if (message_edit_text.text.toString().isEmpty()) {
+                return@setOnClickListener
+            }
 
             val message = Message(
                 conversation.participants[0].username,
@@ -63,12 +73,32 @@ class ConversationActivity : AppCompatActivity() {
         messages_recycler_view.layoutManager = linearLayoutManager
     }
 
-    private fun initMessagesListeners(conversationId: String) {
-        FirebaseFirestore.getInstance().collection("conversations")
-            .document(conversationId)
-            .addSnapshotListener { snapshot, firestoreException ->
-                // TODO: Reload messages
+    private fun initConversationListener(conversationId: String) {
+        registrationListener = FirebaseFirestore.getInstance().collection("conversations")
+            .whereEqualTo("id", conversationId)
+            .addSnapshotListener { querySnapshot, _ ->
+                val docChange = querySnapshot!!.documentChanges.first()
+                if (docChange.type == DocumentChange.Type.MODIFIED) {
+                    fetchNewMessage(docChange.document.data["messages"])
+                }
             }
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun fetchNewMessage(messages: Any?) {
+        messages as ArrayList<HashMap<String, *>>
+        val message = Message(messages[messages.lastIndex])
+        if (message.sender == conversation.participants[0].username) {
+            return
+        }
+        message.type = Message.Type.FROM
+        conversation.messages.add(message)
+        messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
+        adapter.notifyDataSetChanged()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        registrationListener.remove()
+    }
 }
