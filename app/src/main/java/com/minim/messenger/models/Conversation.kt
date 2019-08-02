@@ -11,6 +11,7 @@ data class Conversation(
     val id = generateId()
 
     val document = hashMapOf<String, Any>(
+        "id" to id,
         "participants" to arrayListOf<String>().also {
             participants.forEach { p -> it.add(p.username.toString()) }
         },
