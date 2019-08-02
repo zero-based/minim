@@ -5,14 +5,15 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 
 data class Message(
+    var id: String? = null,
     val sender: String? = null,
     val receiver: String? = null,
     var type: Type? = null,
     val content: String? = null,
-    val isRead: Boolean? = null,
+    var seen: Boolean? = null,
     val duration: Long? = null,
-    val sent: Timestamp? = null,
-    val seen: Timestamp? = null
+    val sentOn: Timestamp? = null,
+    var seenOn: Timestamp? = null
 ) : Parcelable {
 
     enum class Type {
@@ -20,18 +21,8 @@ data class Message(
         FROM
     }
 
-    constructor(hashMap: HashMap<*, *>) : this(
-        hashMap["sender"].toString(),
-        hashMap["receiver"].toString(),
-        Type.valueOf(hashMap["type"].toString()),
-        hashMap["content"].toString(),
-        hashMap["read"] as Boolean,
-        hashMap["duration"] as Long,
-        hashMap["sent"] as Timestamp,
-        hashMap["seen"] as Timestamp
-    )
-
     constructor(parcel: Parcel) : this(
+        parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         Type.values()[parcel.readInt()],
@@ -43,14 +34,15 @@ data class Message(
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(id)
         parcel.writeString(sender)
         parcel.writeString(receiver)
         parcel.writeInt(type?.ordinal!!)
         parcel.writeString(content)
-        parcel.writeValue(isRead)
+        parcel.writeValue(seen)
         parcel.writeValue(duration)
-        parcel.writeParcelable(sent, flags)
-        parcel.writeParcelable(seen, flags)
+        parcel.writeParcelable(sentOn, flags)
+        parcel.writeParcelable(seenOn, flags)
     }
 
     override fun describeContents() = 0

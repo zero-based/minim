@@ -1,7 +1,9 @@
 package com.minim.messenger.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
@@ -14,15 +16,13 @@ import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation_log.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import android.net.Uri
 
 class ConversationLogActivity : AppCompatActivity() {
 
     private lateinit var conversation: Conversation
     private lateinit var adapter: MessagesAdapter
     private lateinit var registrationListener: ListenerRegistration
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -53,8 +53,9 @@ class ConversationLogActivity : AppCompatActivity() {
             if (message_edit_text.text.toString().isEmpty()) {
                 return@setOnClickListener
             }
-
+            val docRef = firestore.collection("messages").document()
             val message = Message(
+                docRef.id,
                 conversation.user.username,
                 conversation.other.username,
                 Message.Type.TO,
@@ -62,20 +63,17 @@ class ConversationLogActivity : AppCompatActivity() {
                 false,
                 1440,
                 Timestamp.now(),
-                Timestamp.now()
+                null
             )
+            docRef.set(message).addOnCompleteListener {
+                firestore.collection("conversations").document(conversation.id)
+                    .update("messages", FieldValue.arrayUnion(message.id))
+            }
 
             adapter.messages.add(message)
             messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
             adapter.notifyDataSetChanged()
             message_edit_text.text.clear()
-
-            FirebaseFirestore.getInstance()
-                .collection("conversations")
-                .document(conversation.id)
-                .update("messages", FieldValue.arrayUnion(message)).addOnFailureListener {
-                    // TODO: Message not sent warning!
-                }
         }
     }
 
@@ -98,16 +96,24 @@ class ConversationLogActivity : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun fetchNewMessage(messages: Any?) {
-        messages as ArrayList<HashMap<String, *>>
-        val message = Message(messages[messages.lastIndex])
-        if (message.sender == conversation.user.username) {
-            return
+    private fun fetchNewMessage(messagesIds: Any?) {
+
+        messagesIds as ArrayList<String>
+        val docRef = firestore.collection("messages").document(messagesIds.last())
+        docRef.get().addOnSuccessListener {
+            val message = it.toObject(Message::class.java)!!
+            if (message.sender == conversation.user.username) {
+                return@addOnSuccessListener
+            }
+            message.seen = true
+            message.seenOn = Timestamp.now()
+            docRef.set(message)
+            message.type = Message.Type.FROM
+
+            conversation.messages.add(message)
+            messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
+            adapter.notifyDataSetChanged()
         }
-        message.type = Message.Type.FROM
-        conversation.messages.add(message)
-        messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
-        adapter.notifyDataSetChanged()
     }
 
     override fun onBackPressed() {

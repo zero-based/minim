@@ -126,7 +126,7 @@ class ConversationsActivity : AppCompatActivity() {
             it.type == DocumentChange.Type.ADDED
         }
 
-        for (documentChange in documentChanges) {
+        for ((i, documentChange) in documentChanges.withIndex()) {
 
             val participants = documentChange.document["participants"] as ArrayList<String>
             val contactUsername = participants.find { it != currentUser.username }!!
@@ -139,8 +139,10 @@ class ConversationsActivity : AppCompatActivity() {
                     val conversation = Conversation(arrayListOf(currentUser, contact))
                     adapter.conversations.add(conversation)
                 }.addOnCompleteListener {
-                    contacts_progress_bar.visibility = View.GONE
-                    adapter.notifyDataSetChanged()
+                    if (i == documentChanges.lastIndex) {
+                        contacts_progress_bar.visibility = View.GONE
+                        adapter.notifyDataSetChanged()
+                    }
                 }
 
         }
@@ -149,18 +151,22 @@ class ConversationsActivity : AppCompatActivity() {
     @Suppress("UNCHECKED_CAST")
     private fun newMessageNotification(documentChange: DocumentChange) {
 
-        val messages = documentChange.document["messages"] as ArrayList<HashMap<String, *>>
-        val message = Message(messages.last())
+        val messagesIds = documentChange.document["messages"] as ArrayList<String>
+        val docRef = firestore.collection("messages").document(messagesIds.last())
 
-        if (message.sender == currentUser.username) {
-            return
+        var message = Message()
+        docRef.get().addOnSuccessListener {
+            message = it.toObject(Message::class.java)!!
+        }.addOnCompleteListener {
+            if (message.sender == currentUser.username) {
+                return@addOnCompleteListener
+            }
+            val id = documentChange.document["id"].toString()
+            val index = adapter.conversations.indexOfFirst { it.id == id }
+            adapter.conversations[index].hasChanges = true
+            adapter.notifyItemChanged(index)
+            pushNotification(message, index)
         }
-
-        val id = documentChange.document["id"].toString()
-        val index = adapter.conversations.indexOfFirst { it.id == id }
-        adapter.conversations[index].hasChanges = true
-        adapter.notifyItemChanged(index)
-        pushNotification(message, index)
     }
 
     private fun pushNotification(message: Message, index: Int) {
