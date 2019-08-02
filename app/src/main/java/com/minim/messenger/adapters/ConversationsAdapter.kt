@@ -1,11 +1,14 @@
 package com.minim.messenger.adapters
 
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
@@ -38,7 +41,6 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
 
         holder.parentLayout.setOnClickListener {
 
-
             FirebaseFirestore.getInstance()
                 .collection("conversations")
                 .document(conversation.id)
@@ -52,6 +54,9 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                     conversation.processMessages()
                     ConversationsActivity.currentConversationIndex = position
                     holder.hasChanges.visibility = View.GONE
+
+                    val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.cancel(position)
 
                     val intent = Intent(context, ConversationLogActivity::class.java)
                     intent.putExtra("conversation", conversation)
