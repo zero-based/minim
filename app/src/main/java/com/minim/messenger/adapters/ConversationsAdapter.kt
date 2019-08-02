@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationLogActivity
+import com.minim.messenger.activities.ConversationsActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 
@@ -31,11 +32,12 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
 
         if (conversation.hasChanges!!) {
             holder.hasChanges.visibility = View.VISIBLE
+        } else {
+            holder.hasChanges.visibility = View.GONE
         }
+
         holder.parentLayout.setOnClickListener {
 
-            holder.hasChanges.visibility = View.GONE
-            conversation.hasChanges = false
 
             FirebaseFirestore.getInstance()
                 .collection("conversations")
@@ -48,6 +50,8 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                     }
 
                     conversation.processMessages()
+                    ConversationsActivity.currentConversationIndex = position
+                    holder.hasChanges.visibility = View.GONE
 
                     val intent = Intent(context, ConversationLogActivity::class.java)
                     intent.putExtra("conversation", conversation)

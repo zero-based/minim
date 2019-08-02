@@ -4,7 +4,9 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:padding="8dp"
+              android:paddingBottom="16dp"
+              android:paddingRight="24dp"
+              android:paddingLeft="24dp"
               android:gravity="center">
 
     <TextView android:id="@+id/other_username"
