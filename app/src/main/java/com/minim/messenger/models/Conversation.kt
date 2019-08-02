@@ -9,6 +9,9 @@ data class Conversation(
 ) : Parcelable {
 
     val id = generateId()
+    var hasChanges: Boolean? = false
+    val user = participants[0]
+    val other = participants[1]
 
     val document = hashMapOf<String, Any>(
         "id" to id,

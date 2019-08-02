@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
             authUser?.updateProfile(profileUpdates)?.addOnCompleteListener {
                 authUser.updateEmail(email).addOnCompleteListener {
                     userDocRef.set(User(authUser)).addOnCompleteListener {
-                        SigningActivity.startActivity(this, ContactsActivity::class.java)
+                        SigningActivity.startActivity(this, ConversationsActivity::class.java)
                     }
                 }
             }

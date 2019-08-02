@@ -10,28 +10,28 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.minim.messenger.R
-import com.minim.messenger.adapters.ConversationAdapter
+import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
-import kotlinx.android.synthetic.main.activity_conversation.*
+import kotlinx.android.synthetic.main.activity_conversation_log.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.net.Uri
 
 
-class ConversationActivity : AppCompatActivity() {
+class ConversationLogActivity : AppCompatActivity() {
 
     private lateinit var conversation: Conversation
-    private lateinit var adapter: ConversationAdapter
+    private lateinit var adapter: MessagesAdapter
     private lateinit var registrationListener: ListenerRegistration
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_conversation)
+        setContentView(R.layout.activity_conversation_log)
 
         conversation = intent.getParcelableExtra<Conversation>("conversation")!!
-        adapter = ConversationAdapter(conversation.messages)
+        adapter = MessagesAdapter(conversation.messages)
 
         contact_username_text_view.text = conversation.participants[1].username
         initRecyclerView()

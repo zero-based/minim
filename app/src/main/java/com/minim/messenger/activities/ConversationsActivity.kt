@@ -6,28 +6,27 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
-import com.minim.messenger.adapters.ContactsAdapter
+import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.User
-import kotlinx.android.synthetic.main.activity_contacts.*
+import kotlinx.android.synthetic.main.activity_conversations.*
 
-class ContactsActivity : AppCompatActivity() {
+class ConversationsActivity : AppCompatActivity() {
 
-    private lateinit var adapter: ContactsAdapter
-    private var contacts = arrayListOf<User>()
+    private lateinit var adapter: ConversationsAdapter
+    private var conversations = arrayListOf<Conversation>()
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contacts)
+        setContentView(R.layout.activity_conversations)
 
         currentUser = User(auth.currentUser!!)
         initRecyclerView()
@@ -55,7 +54,7 @@ class ContactsActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        adapter = ContactsAdapter(this, contacts)
+        adapter = ConversationsAdapter(this, conversations)
         contacts_recycler_view.adapter = adapter
         contacts_recycler_view.layoutManager = LinearLayoutManager(this)
     }
@@ -79,7 +78,7 @@ class ContactsActivity : AppCompatActivity() {
     }
 
     private fun contactExists(username: String): Boolean {
-        contacts.find { it.username.equals(username) } ?: return false
+        conversations.find { it.other.username.equals(username) } ?: return false
         return true
     }
 
@@ -106,9 +105,8 @@ class ContactsActivity : AppCompatActivity() {
             val conversation = Conversation(arrayListOf(currentUser, contact))
             firestore.collection("conversations").document(conversation.id).set(conversation.document)
 
-            adapter.contacts.add(contact)
+            adapter.conversations.add(conversation)
             adapter.notifyDataSetChanged()
-
         }
 
     }
@@ -122,6 +120,7 @@ class ContactsActivity : AppCompatActivity() {
         if (documentChanges.isEmpty()) {
             contacts_progress_bar.visibility = View.GONE
         }
+
         for (documentChange in documentChanges) {
 
             val participants = documentChange.document["participants"] as ArrayList<String>
@@ -132,7 +131,8 @@ class ContactsActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener {
                     val contact = it.toObject(User::class.java)!!
-                    adapter.contacts.add(contact)
+                    val conversation = Conversation(arrayListOf(currentUser, contact))
+                    adapter.conversations.add(conversation)
                 }.addOnCompleteListener {
                     contacts_progress_bar.visibility = View.GONE
                     adapter.notifyDataSetChanged()
@@ -146,9 +146,9 @@ class ContactsActivity : AppCompatActivity() {
         val participants = documentChange.document["participants"] as ArrayList<String>
         val contactUsername = participants.find { it != currentUser.username }!!
 
-        adapter.contacts.forEachIndexed { i, user ->
-            if (user.username == contactUsername) {
-                adapter.contacts[i].hasChanges = true
+        adapter.conversations.forEachIndexed { i, conversation ->
+            if (conversation.other.username == contactUsername) {
+                adapter.conversations[i].hasChanges = true
                 adapter.notifyItemChanged(i)
                 return@forEachIndexed
             }
