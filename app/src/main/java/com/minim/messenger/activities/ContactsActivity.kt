@@ -1,5 +1,6 @@
 package com.minim.messenger.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -28,9 +29,7 @@ class ContactsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
-        val authUser = auth.currentUser!!
-        currentUser = User(authUser.uid, authUser.phoneNumber, authUser.displayName)
-
+        currentUser = User(auth.currentUser!!)
         initRecyclerView()
         initConversationListeners()
 
@@ -38,6 +37,11 @@ class ContactsActivity : AppCompatActivity() {
             if (SettingsActivity().isUsernameValid(this, search_edit_text)) {
                 addContact(search_edit_text.text.toString())
             }
+        }
+
+        settings_button.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
 
         search_edit_text.addTextChangedListener(object : TextWatcher {

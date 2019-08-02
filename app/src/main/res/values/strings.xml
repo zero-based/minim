@@ -8,4 +8,5 @@
     <string name="save">Save</string>
     <string name="type_a_message">Type a message</string>
     <string name="search_or_add">Search or add contacts</string>
+    <string name="email">email</string>
 </resources>

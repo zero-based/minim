@@ -1,5 +1,6 @@
 package com.minim.messenger.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,9 +14,10 @@ import com.minim.messenger.adapters.ConversationAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import kotlinx.android.synthetic.main.activity_conversation.*
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import android.net.Uri
+
 
 class ConversationActivity : AppCompatActivity() {
 
@@ -34,6 +36,19 @@ class ConversationActivity : AppCompatActivity() {
         contact_username_text_view.text = conversation.participants[1].username
         initRecyclerView()
         initConversationListener(conversation.id)
+
+        attach_button.setOnClickListener {
+            val sender = conversation.participants[0]
+            val receiver = conversation.participants[1]
+            val emailIntent = Intent(
+                Intent.ACTION_SENDTO, Uri.fromParts(
+                    "mailto", "${receiver.email}", null
+                )
+            )
+            val subject = "[${R.string.app_name}] Attachment from ${sender.username}"
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+            startActivity(Intent.createChooser(emailIntent, "Send email..."))
+        }
 
         send_button.setOnClickListener {
 
