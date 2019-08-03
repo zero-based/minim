@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationLogActivity
@@ -51,8 +51,8 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                         conversation.messages.add(doc.toObject(Message::class.java)!!)
                     }
                 }.addOnCompleteListener {
+                    deleteOverDueMessages(conversation)
                     markSeenMessages(conversation)
-                    conversation.markSeenMessages()
                     conversation.processMessages()
                     dismissExistingNotification(holder, position)
                     startConversation(conversation)
@@ -66,6 +66,14 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
             firestore.collection("messages")
                 .document(m.id!!)
                 .set(m.also { it.markAsSeen() })
+        }
+    }
+
+    private fun deleteOverDueMessages(conversation: Conversation) {
+        conversation.getOverDueMessages().forEach { m ->
+            firestore.collection("messages").document(m.id!!).delete()
+            firestore.collection("conversations").document(conversation.id)
+                .update("messages", FieldValue.arrayRemove(m.id))
         }
     }
 

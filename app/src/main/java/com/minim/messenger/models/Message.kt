@@ -14,7 +14,8 @@ data class Message(
     var seen: Boolean? = null,
     val duration: Long? = null,
     val sentOn: Timestamp? = null,
-    var seenOn: Timestamp? = null
+    var seenOn: Timestamp? = null,
+    var deleteOn: Timestamp? = null
 ) : Parcelable {
 
     enum class Type {
@@ -25,6 +26,7 @@ data class Message(
     fun markAsSeen() {
         seen = true
         seenOn = Timestamp.now()
+        deleteOn = Timestamp(seenOn!!.seconds + duration!!, 0)
     }
 
     constructor(parcel: Parcel) : this(
@@ -36,6 +38,7 @@ data class Message(
         parcel.readString(),
         parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
         parcel.readValue(Long::class.java.classLoader) as? Long,
+        parcel.readParcelable(Timestamp::class.java.classLoader),
         parcel.readParcelable(Timestamp::class.java.classLoader),
         parcel.readParcelable(Timestamp::class.java.classLoader)
     )
@@ -51,6 +54,7 @@ data class Message(
         parcel.writeValue(duration)
         parcel.writeParcelable(sentOn, flags)
         parcel.writeParcelable(seenOn, flags)
+        parcel.writeParcelable(deleteOn, flags)
     }
 
     override fun describeContents() = 0

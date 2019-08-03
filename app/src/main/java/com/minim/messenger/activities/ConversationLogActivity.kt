@@ -3,7 +3,6 @@ package com.minim.messenger.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
@@ -23,6 +22,7 @@ class ConversationLogActivity : AppCompatActivity() {
     private lateinit var adapter: MessagesAdapter
     private lateinit var registrationListener: ListenerRegistration
     private val firestore = FirebaseFirestore.getInstance()
+    private var isFirstTime = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -34,7 +34,7 @@ class ConversationLogActivity : AppCompatActivity() {
 
         contact_username_text_view.text = conversation.other.username
         initRecyclerView()
-        initConversationListener(conversation.id)
+        initConversationListener()
 
         attach_button.setOnClickListener {
             val emailIntent = Intent(
@@ -55,17 +55,19 @@ class ConversationLogActivity : AppCompatActivity() {
             }
             val docRef = firestore.collection("messages").document()
             val message = Message(
-                docRef.id,
-                conversation.id,
-                conversation.user.username,
-                conversation.other.username,
-                Message.Type.TO,
-                message_edit_text.text.toString(),
-                false,
-                1440,
-                Timestamp.now(),
-                null
+                id = docRef.id,
+                conversationId = conversation.id,
+                sender = conversation.user.username,
+                receiver = conversation.other.username,
+                type = Message.Type.TO,
+                content = message_edit_text.text.toString(),
+                seen = false,
+                duration = 10,
+                sentOn = Timestamp.now(),
+                seenOn = null,
+                deleteOn = null
             )
+
             docRef.set(message).addOnCompleteListener {
                 firestore.collection("conversations").document(conversation.id)
                     .update("messages", FieldValue.arrayUnion(message.id))
@@ -85,35 +87,54 @@ class ConversationLogActivity : AppCompatActivity() {
         messages_recycler_view.layoutManager = linearLayoutManager
     }
 
-    private fun initConversationListener(conversationId: String) {
-        registrationListener = FirebaseFirestore.getInstance().collection("conversations")
-            .whereEqualTo("id", conversationId)
-            .addSnapshotListener { querySnapshot, _ ->
-                val docChange = querySnapshot!!.documentChanges.first()
-                if (docChange.type == DocumentChange.Type.MODIFIED) {
-                    fetchNewMessage(docChange.document.data["messages"])
+    private fun initConversationListener() {
+
+        registrationListener = firestore.collection("messages")
+            .whereEqualTo("conversationId", conversation.id)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null || isFirstTime) {
+                    isFirstTime = false
+                    return@addSnapshotListener
+                }
+                for (dc in snapshots!!.documentChanges) {
+
+                    val message = dc.document.toObject(Message::class.java)
+                    val i = conversation.getMessageIndex(message.id!!)
+
+                    when {
+                        dc.type == DocumentChange.Type.ADDED -> fetchNewMessage(message)
+                        dc.type == DocumentChange.Type.MODIFIED -> updateMessageData(i, message)
+                        dc.type == DocumentChange.Type.REMOVED -> removeMessage(i)
+                    }
                 }
             }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun fetchNewMessage(messagesIds: Any?) {
-
-        messagesIds as ArrayList<String>
-        val docRef = firestore.collection("messages").document(messagesIds.last())
-        docRef.get().addOnSuccessListener {
-            val message = it.toObject(Message::class.java)!!
-            if (message.sender == conversation.user.username) {
-                return@addOnSuccessListener
-            }
-            message.markAsSeen()
-            docRef.set(message)
-            message.type = Message.Type.FROM
-
-            conversation.messages.add(message)
-            messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
-            adapter.notifyDataSetChanged()
+    private fun fetchNewMessage(message: Message) {
+        val isSenderCurrentUser = message.sender == conversation.user.username
+        if (isSenderCurrentUser) {
+            return
         }
+        message.markAsSeen()
+        firestore.collection("messages").document(message.id!!).set(message)
+        message.type = Message.Type.FROM
+        conversation.messages.add(message)
+        messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun updateMessageData(index: Int, newMessage: Message) {
+        if (newMessage.sender == conversation.other.username) {
+            newMessage.type = Message.Type.FROM
+        }
+        conversation.messages[index] = newMessage
+        adapter.notifyItemChanged(index)
+    }
+
+    private fun removeMessage(index: Int) {
+        conversation.messages.removeAt(index)
+        adapter.notifyItemRemoved(index)
     }
 
     override fun onBackPressed() {
