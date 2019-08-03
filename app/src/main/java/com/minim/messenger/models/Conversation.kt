@@ -5,34 +5,24 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 
 data class Conversation(
+    val id: String? = null,
     val participants: ArrayList<User> = arrayListOf(),
     val messages: ArrayList<Message> = arrayListOf()
 ) : Parcelable {
 
-    val id = generateId()
     var hasChanges: Boolean? = false
     val user = participants[0]
     val other = participants[1]
 
     val document = hashMapOf<String, Any>(
-        "id" to id,
+        "id" to id.toString(),
         "participants" to arrayListOf<String>().also {
-            participants.forEach { p -> it.add(p.username.toString()) }
+            participants.forEach { p -> it.add(p.uid.toString()) }
         },
         "messages" to arrayListOf<String>().also {
             messages.forEach { m -> it.add(m.id.toString()) }
         }
     )
-
-    private fun generateId(): String {
-        return arrayListOf<String>().also {
-            participants.sortedBy { user ->
-                user.username
-            }.forEach { user ->
-                it.add(user.username.toString())
-            }
-        }.joinToString(":")
-    }
 
     fun processMessages() {
         categorizeMessages()
@@ -43,7 +33,7 @@ data class Conversation(
 
     private fun categorizeMessages() {
         messages.filter { m ->
-            m.sender == other.username
+            m.sender == other.uid
         }.forEach { m ->
             m.type = Message.Type.FROM
         }
@@ -51,7 +41,7 @@ data class Conversation(
 
     fun getOtherUnseenMessages(): List<Message> {
         return messages.filter {
-            it.sender == other.username && it.seen == false
+            it.sender == other.uid && it.seen == false
         }
     }
 
@@ -80,6 +70,7 @@ data class Conversation(
     }
 
     constructor(parcel: Parcel) : this(
+        parcel.readString(),
         arrayListOf<User>().apply {
             parcel.readList(this as List<*>, User::class.java.classLoader)
         },
@@ -89,6 +80,7 @@ data class Conversation(
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(id)
         parcel.writeList(participants as List<*>?)
         parcel.writeList(messages as List<*>?)
     }

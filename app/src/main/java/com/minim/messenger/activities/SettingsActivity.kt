@@ -28,27 +28,30 @@ class SettingsActivity : AppCompatActivity() {
     private fun addUser(username: String, email: String) {
 
         val firestore = FirebaseFirestore.getInstance()
-        val userDocRef = firestore.collection("users").document(username)
+        firestore.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { u ->
+                if (!u.isEmpty) {
+                    username_edit_text.error = "@$username already in use. Try another."
+                    return@addOnSuccessListener
+                }
 
-        userDocRef.get().addOnCompleteListener {
-
-            if (it.result!!.exists()) {
-                username_edit_text.error = "@$username already in use. Try another."
-                return@addOnCompleteListener
-            }
-
-            val authUser = FirebaseAuth.getInstance().currentUser
-            val profileUpdates = UserProfileChangeRequest.Builder()
-                .setDisplayName(username)
-                .build()
-            authUser?.updateProfile(profileUpdates)?.addOnCompleteListener {
-                authUser.updateEmail(email).addOnCompleteListener {
-                    userDocRef.set(User(authUser)).addOnCompleteListener {
-                        SigningActivity.startActivity(this, ConversationsActivity::class.java)
+                val authUser = FirebaseAuth.getInstance().currentUser
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(username)
+                    .build()
+                authUser?.updateProfile(profileUpdates)?.addOnCompleteListener {
+                    authUser.updateEmail(email).addOnCompleteListener {
+                        firestore.collection("users")
+                            .document(authUser.uid)
+                            .set(User(authUser))
+                            .addOnCompleteListener {
+                                SigningActivity.startActivity(this, ConversationsActivity::class.java)
+                            }
                     }
                 }
             }
-        }
 
     }
 

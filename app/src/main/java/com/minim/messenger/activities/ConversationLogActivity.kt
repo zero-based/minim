@@ -57,8 +57,8 @@ class ConversationLogActivity : AppCompatActivity() {
             val message = Message(
                 id = docRef.id,
                 conversationId = conversation.id,
-                sender = conversation.user.username,
-                receiver = conversation.other.username,
+                sender = conversation.user.uid,
+                receiver = conversation.other.uid,
                 type = Message.Type.TO,
                 content = message_edit_text.text.toString(),
                 seen = false,
@@ -69,7 +69,7 @@ class ConversationLogActivity : AppCompatActivity() {
             )
 
             docRef.set(message).addOnCompleteListener {
-                firestore.collection("conversations").document(conversation.id)
+                firestore.collection("conversations").document(conversation.id!!)
                     .update("messages", FieldValue.arrayUnion(message.id))
             }
 
@@ -112,7 +112,7 @@ class ConversationLogActivity : AppCompatActivity() {
 
     @Suppress("UNCHECKED_CAST")
     private fun fetchNewMessage(message: Message) {
-        val isSenderCurrentUser = message.sender == conversation.user.username
+        val isSenderCurrentUser = message.sender == conversation.user.uid
         if (isSenderCurrentUser) {
             return
         }
@@ -125,7 +125,7 @@ class ConversationLogActivity : AppCompatActivity() {
     }
 
     private fun updateMessageData(index: Int, newMessage: Message) {
-        if (newMessage.sender == conversation.other.username) {
+        if (newMessage.sender == conversation.other.uid) {
             newMessage.type = Message.Type.FROM
         }
         conversation.messages[index] = newMessage

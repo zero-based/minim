@@ -72,7 +72,7 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
     private fun deleteOverDueMessages(conversation: Conversation) {
         conversation.getOverDueMessages().forEach { m ->
             firestore.collection("messages").document(m.id!!).delete()
-            firestore.collection("conversations").document(conversation.id)
+            firestore.collection("conversations").document(conversation.id!!)
                 .update("messages", FieldValue.arrayRemove(m.id))
         }
     }
