@@ -1,0 +1,291 @@
+.imageWrapper {
+  // Sets the background image in the header area
+  height: 714px;
+  background: linear-gradient(
+      rgba($image-overlay-color, $image-overlay-transparency),
+      rgba($image-overlay-color, $image-overlay-transparency)
+    ),
+    url($header-image);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top;
+  border-radius: 0px 0px 40px 40px;
+}
+
+.container {
+  // Set up the container for the site content
+  display: grid;
+  margin: auto;
+  max-width: $content-width;
+  padding: 120px 15px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 876px auto;
+  grid-column-gap: 30px;
+  grid-template-areas:
+    "p p p p p i i i i i i i"
+    "c c c c c c c c c c c c";
+}
+
+@media only screen and (max-width: 1070px) {
+  .container {
+    // Set up the container for the site content
+    grid-template-rows: 811px auto;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .container {
+    grid-column-gap: 0px;
+    grid-template-columns: 1;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "i i i i i i i i i i i i"
+      "p p p p p p p p p p p p"
+      "c c c c c c c c c c c c";
+  }
+}
+
+// App Title, Price, Description and Links
+
+.appInfo {
+  grid-area: i;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 140px;
+  align-content: flex-start;
+}
+
+@media only screen and (max-width: 992px) {
+  .appInfo {
+    padding-top: 50px;
+    justify-content: center;
+  }
+}
+
+.appIconShadow {
+  display: flex;
+  filter: $drop-shadow;
+}
+
+.appIconLarge {
+  width: 120px;
+  height: 120px;
+}
+
+.appNameContainer {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  margin-left: 16px;
+}
+
+.appName {
+  color: $app-title-color;
+  font-family: $font;
+}
+
+@media only screen and (max-width: 768px) {
+  .appNameContainer {
+    width: 100%;
+    margin-left: 0px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .appName {
+    margin-top: 30px;
+    text-align: center;
+  }
+}
+
+.appDescriptionContainer {
+  font-size: 2.5rem;
+  font-weight: normal;
+  width: 100%;
+  align-items: flex-start;
+  margin-top: 30px;
+  flex: 0 1 auto;
+  line-height: 1.5;
+}
+
+.appDescription {
+  color: $app-description-color;
+}
+
+@media only screen and (max-width: 992px) {
+  .appDescription {
+    text-align: center;
+  }
+}
+
+.downloadButtonsContainer {
+  display: inline-block;
+  margin-top: 42px;
+  filter: $drop-shadow;
+}
+
+@media only screen and (max-width: 992px) {
+  .downloadButtonsContainer {
+    text-align: center;
+  }
+}
+
+.github {
+  height: 75px;
+  margin-right: 24px;
+}
+
+@media only screen and (max-width: 992px) {
+  .github {
+    margin-right: 24px;
+    margin-bottom: 0px;
+  }
+}
+
+@media only screen and (max-width: 528px) {
+  .github {
+    margin-right: 0px;
+    margin-bottom: 24px;
+  }
+}
+
+// iPhone Device Preview
+
+.iphonePreview {
+  grid-area: p;
+  background-image: url($device-color);
+  background-size: 400px auto;
+  background-repeat: no-repeat;
+  margin-top: 68px;
+}
+
+.iphoneScreen {
+  width: 349px;
+  -webkit-clip-path: url(#screenMask);
+  clip-path: url(#screenMask);
+  margin-left: 26px;
+  margin-top: 23px;
+}
+
+@media only screen and (max-width: 1070px) {
+  .iphonePreview {
+    background-size: 370px auto;
+  }
+
+  .iphoneScreen {
+    width: 322px;
+    margin-left: 24px;
+    margin-top: 22px;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .iphonePreview {
+    display: flex;
+    background-size: 260px auto;
+    background-position: center 0;
+    margin-top: 47px;
+    justify-content: center;
+    padding-bottom: 75px;
+  }
+
+  .iphoneScreen {
+    width: 226px;
+    height: 488px;
+    -webkit-clip-path: url(#screenMask);
+    clip-path: url(#screenMask);
+    margin: 0px;
+    margin-top: 17px;
+  }
+}
+
+// Feature List
+
+.features {
+  grid-area: c;
+  display: flex;
+  flex: 0 1 auto;
+  align-content: flex-start;
+  justify-content: flex-start;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  margin-top: 110px;
+}
+
+.feature {
+  display: flex;
+  padding-top: 63px;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: calc(100% / 3);
+}
+
+.feature:nth-child(-n + 3) {
+  padding-top: 0px;
+}
+
+.feature:nth-child(3n) {
+  padding-right: 0px;
+}
+
+.feature:nth-child(3n + 1) {
+  padding-left: 0px;
+}
+
+.iconBack {
+  color: $feature-icons-background-color;
+}
+
+.iconTop {
+  color: $feature-icons-foreground-color;
+}
+
+.featureText {
+  margin-left: 18px;
+}
+
+.featureText > h3 {
+  color: $feature-title-color;
+}
+
+.featureText > p {
+  color: $feature-text-color;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+@media only screen and (max-width: 992px) {
+  .features {
+    flex-grow: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 11px;
+  }
+
+  .feature {
+    display: flex;
+    padding-top: 41px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+  }
+
+  .feature:nth-child(-n + 3) {
+    padding-top: 41px;
+  }
+
+  .feature:nth-child(1) {
+    padding-top: 0px;
+  }
+
+  .feature:nth-child(3n) {
+    padding-right: 15px;
+  }
+
+  .feature:nth-child(3n + 1) {
+    padding-left: 15px;
+  }
+}
