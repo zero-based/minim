@@ -81,8 +81,6 @@ class ConversationsActivity : AppCompatActivity() {
                         return@addSnapshotListener
                     } else if (dc.type == DocumentChange.Type.MODIFIED) {
                         newMessageNotification(querySnapshot.documentChanges.last())
-                    } else if (dc.type == DocumentChange.Type.REMOVED) {
-                        TODO()
                     }
                 }
             }
@@ -144,7 +142,6 @@ class ConversationsActivity : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 }
-
         }
     }
 
@@ -152,14 +149,18 @@ class ConversationsActivity : AppCompatActivity() {
     private fun newMessageNotification(documentChange: DocumentChange) {
 
         val messagesIds = documentChange.document["messages"] as ArrayList<String>
-        val docRef = firestore.collection("messages").document(messagesIds.last())
+        if (messagesIds.isEmpty()) {
+            return
+        }
 
-        var message = Message()
+        val docRef = firestore.collection("messages").document(messagesIds.last())
         docRef.get().addOnSuccessListener {
-            message = it.toObject(Message::class.java)!!
-        }.addOnCompleteListener {
+            if (!it.exists()) {
+                return@addOnSuccessListener
+            }
+            val message = it.toObject(Message::class.java)!!
             if (message.sender == currentUser.username) {
-                return@addOnCompleteListener
+                return@addOnSuccessListener
             }
             val id = documentChange.document["id"].toString()
             val index = adapter.conversations.indexOfFirst { it.id == id }
@@ -167,6 +168,7 @@ class ConversationsActivity : AppCompatActivity() {
             adapter.notifyItemChanged(index)
             pushNotification(message, index)
         }
+
     }
 
     private fun pushNotification(message: Message, index: Int) {
