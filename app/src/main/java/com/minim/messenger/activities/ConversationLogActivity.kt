@@ -56,6 +56,7 @@ class ConversationLogActivity : AppCompatActivity() {
             val docRef = firestore.collection("messages").document()
             val message = Message(
                 docRef.id,
+                conversation.id,
                 conversation.user.username,
                 conversation.other.username,
                 Message.Type.TO,
@@ -105,8 +106,7 @@ class ConversationLogActivity : AppCompatActivity() {
             if (message.sender == conversation.user.username) {
                 return@addOnSuccessListener
             }
-            message.seen = true
-            message.seenOn = Timestamp.now()
+            message.markAsSeen()
             docRef.set(message)
             message.type = Message.Type.FROM
 

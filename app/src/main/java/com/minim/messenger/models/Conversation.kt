@@ -35,12 +35,12 @@ data class Conversation(
     }
 
     fun processMessages() {
-        val other = participants[1]
         messages.filter { m ->
             m.sender == other.username
         }.forEach { m ->
             m.type = Message.Type.FROM
         }
+        messages.sortBy { it.sentOn }
     }
 
     fun getOtherUnseenMessages(): List<Message> {

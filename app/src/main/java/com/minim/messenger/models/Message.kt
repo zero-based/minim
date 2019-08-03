@@ -6,6 +6,7 @@ import com.google.firebase.Timestamp
 
 data class Message(
     var id: String? = null,
+    var conversationId: String? = null,
     val sender: String? = null,
     val receiver: String? = null,
     var type: Type? = null,
@@ -21,7 +22,13 @@ data class Message(
         FROM
     }
 
+    fun markAsSeen() {
+        seen = true
+        seenOn = Timestamp.now()
+    }
+
     constructor(parcel: Parcel) : this(
+        parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
@@ -35,6 +42,7 @@ data class Message(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
+        parcel.writeString(conversationId)
         parcel.writeString(sender)
         parcel.writeString(receiver)
         parcel.writeInt(type?.ordinal!!)

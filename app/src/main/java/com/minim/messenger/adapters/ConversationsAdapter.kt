@@ -21,6 +21,7 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
     RecyclerView.Adapter<ConversationsAdapter.ContactHolder>(), Filterable {
 
     private var filteredConversations = conversations
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun getItemCount() = filteredConversations.size
 
@@ -40,40 +41,31 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         }
 
         holder.parentLayout.setOnClickListener {
-            val firestore = FirebaseFirestore.getInstance()
 
-            val docRef = firestore.collection("conversations").document(conversation.id)
-
-            docRef.get().addOnCompleteListener {
-
-                val messagesIds = it.result!!["messages"] as ArrayList<String>
-                if (messagesIds.isEmpty()) {
+            firestore.collection("messages")
+                .whereEqualTo("conversationId", conversation.id)
+                .get()
+                .addOnSuccessListener {
+                    conversation.messages.clear()
+                    it.documents.forEach { doc ->
+                        conversation.messages.add(doc.toObject(Message::class.java)!!)
+                    }
+                }.addOnCompleteListener {
+                    markSeenMessages(conversation)
+                    conversation.markSeenMessages()
+                    conversation.processMessages()
+                    dismissExistingNotification(holder, position)
                     startConversation(conversation)
-                    return@addOnCompleteListener
                 }
-                for ((i, id) in messagesIds.withIndex()) {
-                    firestore.collection("messages").document(id)
-                        .get().addOnSuccessListener { doc ->
-                            conversation.messages.add(doc.toObject(Message::class.java)!!)
-                        }.addOnCompleteListener {
-                            if (i == messagesIds.lastIndex) {
-                                val unseenMessages = conversation.getOtherUnseenMessages()
-                                unseenMessages.forEach { m ->
-                                    m.seen = true
-                                    m.seenOn = Timestamp.now()
-                                    firestore.collection("messages")
-                                        .document(m.id!!)
-                                        .set(m)
-                                }
-                                conversation.markSeenMessages()
-                                conversation.processMessages()
-                                dismissExistingNotification(holder, position)
-                                startConversation(conversation)
-                            }
-                        }
-                }
-            }
+        }
 
+    }
+
+    private fun markSeenMessages(conversation: Conversation) {
+        conversation.getOtherUnseenMessages().forEach { m ->
+            firestore.collection("messages")
+                .document(m.id!!)
+                .set(m.also { it.markAsSeen() })
         }
     }
 
