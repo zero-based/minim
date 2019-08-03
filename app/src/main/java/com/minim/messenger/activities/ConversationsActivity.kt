@@ -157,26 +157,27 @@ class ConversationsActivity : AppCompatActivity() {
                 return@addOnSuccessListener
             }
             val message = it.toObject(Message::class.java)!!
-            if (message.sender == currentUser.username) {
+            if (message.sender == currentUser.uid) {
                 return@addOnSuccessListener
             }
             val id = document.data!!["id"].toString()
             val index = adapter.conversations.indexOfFirst { c -> c.id == id }
             adapter.conversations[index].hasChanges = true
             adapter.notifyItemChanged(index)
-            pushNotification(message, index)
+            val other =  adapter.conversations[index].participants.find { u -> u.uid == message.sender }!!
+            pushNotification(message, other.username!!, index)
         }
 
     }
 
-    private fun pushNotification(message: Message, index: Int) {
+    private fun pushNotification(message: Message, sender: String, index: Int) {
         val intent = Intent(this, ConversationsActivity::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val builder = NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(message.sender)
+            .setContentTitle(sender)
             .setContentText(message.content)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
