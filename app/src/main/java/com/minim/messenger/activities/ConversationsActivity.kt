@@ -7,13 +7,12 @@ import android.media.RingtoneManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentChange.Type.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
@@ -22,7 +21,6 @@ import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import com.minim.messenger.models.User
 import kotlinx.android.synthetic.main.activity_conversations.*
-
 
 class ConversationsActivity : AppCompatActivity() {
 
@@ -106,15 +104,18 @@ class ConversationsActivity : AppCompatActivity() {
         firestore.collection("conversations")
             .whereArrayContains("participants", currentUser.uid!!)
             .addSnapshotListener { querySnapshot, _ ->
+
                 if (querySnapshot!!.isEmpty) {
                     contacts_progress_bar.visibility = View.GONE
                 }
 
-                for ((i, dc) in querySnapshot.documentChanges.withIndex()) {
-                    if (dc.type == DocumentChange.Type.ADDED) {
-                        fetchContacts(dc.document, i == querySnapshot.documentChanges.lastIndex)
-                    } else if (dc.type == DocumentChange.Type.MODIFIED) {
-                        newMessageNotification(dc.document)
+                val changes = querySnapshot.documentChanges
+                for ((i, dc) in changes.withIndex()) {
+                    when (dc.type) {
+                        ADDED -> fetchContacts(dc.document, i == changes.lastIndex)
+                        MODIFIED -> newMessageNotification(dc.document)
+                        REMOVED -> {
+                        }
                     }
                 }
 
@@ -164,7 +165,7 @@ class ConversationsActivity : AppCompatActivity() {
             val index = adapter.conversations.indexOfFirst { c -> c.id == id }
             adapter.conversations[index].hasChanges = true
             adapter.notifyItemChanged(index)
-            val other =  adapter.conversations[index].participants.find { u -> u.uid == message.sender }!!
+            val other = adapter.conversations[index].participants.find { u -> u.uid == message.sender }!!
             pushNotification(message, other.username!!, index)
         }
 

@@ -28,7 +28,6 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ContactHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false))
 
-    @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: ContactHolder, position: Int) {
 
         val conversation = filteredConversations[position]
@@ -42,39 +41,49 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
 
         holder.parentLayout.setOnClickListener {
 
+            conversation.messages.clear()
+
             firestore.collection("messages")
                 .whereEqualTo("conversationId", conversation.id)
+                .orderBy("sentOn")
                 .get()
                 .addOnSuccessListener {
-                    conversation.messages.clear()
                     it.documents.forEach { doc ->
-                        conversation.messages.add(doc.toObject(Message::class.java)!!)
+                        val message = doc.toObject(Message::class.java)!!
+                        if (message.isOverdue()) {
+                            deleteMessage(conversation, message)
+                        } else {
+                            updateMessageSeen(conversation, message)
+                            message.determineType(conversation.other.uid!!)
+                            conversation.messages.add(message)
+                        }
                     }
                 }.addOnCompleteListener {
-                    deleteOverDueMessages(conversation)
-                    markSeenMessages(conversation)
-                    conversation.processMessages()
                     dismissExistingNotification(holder, position)
                     startConversation(conversation)
                 }
+
         }
 
     }
 
-    private fun markSeenMessages(conversation: Conversation) {
-        conversation.getOtherUnseenMessages().forEach { m ->
-            firestore.collection("messages")
-                .document(m.id!!)
-                .set(m.also { it.markAsSeen() })
-        }
+    private fun deleteMessage(conversation: Conversation, message: Message) {
+        firestore.collection("messages").document(message.id!!).delete()
+        firestore.collection("conversations").document(conversation.id!!)
+            .update("messages", FieldValue.arrayRemove(message.id))
     }
 
-    private fun deleteOverDueMessages(conversation: Conversation) {
-        conversation.getOverDueMessages().forEach { m ->
-            firestore.collection("messages").document(m.id!!).delete()
-            firestore.collection("conversations").document(conversation.id!!)
-                .update("messages", FieldValue.arrayRemove(m.id))
-        }
+    private fun updateMessageSeen(conversation: Conversation, message: Message) {
+        if (message.seen!! || !message.isFromOther(conversation.other.uid!!)) return
+        message.markAsSeen()
+        firestore.collection("messages").document(message.id!!).set(message)
+    }
+
+    private fun dismissExistingNotification(holder: ContactHolder, position: Int) {
+        ConversationsActivity.currentConversationIndex = position
+        holder.hasChanges.visibility = View.GONE
+        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(position)
     }
 
     private fun startConversation(conversation: Conversation) {
@@ -83,35 +92,24 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         context.startActivity(intent)
     }
 
-    private fun dismissExistingNotification(holder: ContactHolder, position: Int) {
-        ConversationsActivity.currentConversationIndex = position
-        holder.hasChanges.visibility = View.GONE
+    override fun getFilter() = filteringStrategy
 
-        val notificationManager =
-            context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(position)
-    }
+    private val filteringStrategy: Filter = object : Filter() {
 
-    override fun getFilter(): Filter {
-
-        return object : Filter() {
-
-            override fun performFiltering(p0: CharSequence?): FilterResults {
-                val query = p0.toString()
-                val filteredList = if (query.isNotEmpty()) {
-                    conversations.filter { it.other.username?.contains(query, true)!! } as ArrayList<Conversation>
-                } else {
-                    conversations
-                }
-                return FilterResults().also { it.values = filteredList }
+        override fun performFiltering(p0: CharSequence?): FilterResults {
+            val query = p0.toString()
+            val filteredList = if (query.isNotEmpty()) {
+                conversations.filter { it.other.username?.contains(query, true)!! } as ArrayList<Conversation>
+            } else {
+                conversations
             }
+            return FilterResults().also { it.values = filteredList }
+        }
 
-            @Suppress("UNCHECKED_CAST")
-            override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
-                filteredConversations = p1!!.values as ArrayList<Conversation>
-                notifyDataSetChanged()
-            }
-
+        @Suppress("UNCHECKED_CAST")
+        override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
+            filteredConversations = p1!!.values as ArrayList<Conversation>
+            notifyDataSetChanged()
         }
 
     }

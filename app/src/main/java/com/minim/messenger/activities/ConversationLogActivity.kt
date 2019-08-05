@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentChange.Type.*
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -18,11 +18,11 @@ import kotlinx.android.synthetic.main.activity_conversation_log.*
 
 class ConversationLogActivity : AppCompatActivity() {
 
+    private val firestore = FirebaseFirestore.getInstance()
+    private var initialLoad: Boolean = true
     private lateinit var conversation: Conversation
     private lateinit var adapter: MessagesAdapter
-    private lateinit var registrationListener: ListenerRegistration
-    private val firestore = FirebaseFirestore.getInstance()
-    private var isFirstTime = true
+    private lateinit var messagesListener: ListenerRegistration
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -32,52 +32,12 @@ class ConversationLogActivity : AppCompatActivity() {
         conversation = intent.getParcelableExtra<Conversation>("conversation")!!
         adapter = MessagesAdapter(conversation.messages)
 
-        contact_username_text_view.text = conversation.other.username
         initRecyclerView()
         initConversationListener()
+        contact_username_text_view.text = conversation.other.username
 
-        attach_button.setOnClickListener {
-            val emailIntent = Intent(
-                Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", "${conversation.other.email}", null
-                )
-            )
-            val appName = resources.getString(R.string.app_name)
-            val subject = "[$appName] Attachment from ${conversation.user.username}"
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-            startActivity(Intent.createChooser(emailIntent, "Send email..."))
-        }
-
-        send_button.setOnClickListener {
-
-            if (message_edit_text.text.toString().isEmpty()) {
-                return@setOnClickListener
-            }
-            val docRef = firestore.collection("messages").document()
-            val message = Message(
-                id = docRef.id,
-                conversationId = conversation.id,
-                sender = conversation.user.uid,
-                receiver = conversation.other.uid,
-                type = Message.Type.TO,
-                content = message_edit_text.text.toString(),
-                seen = false,
-                duration = 10,
-                sentOn = Timestamp.now(),
-                seenOn = null,
-                deleteOn = null
-            )
-
-            docRef.set(message).addOnCompleteListener {
-                firestore.collection("conversations").document(conversation.id!!)
-                    .update("messages", FieldValue.arrayUnion(message.id))
-            }
-
-            adapter.messages.add(message)
-            messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
-            adapter.notifyDataSetChanged()
-            message_edit_text.text.clear()
-        }
+        attach_button.setOnClickListener { sendEmail() }
+        send_button.setOnClickListener { sendMessage(message_edit_text.text.toString()) }
     }
 
     private fun initRecyclerView() {
@@ -87,59 +47,98 @@ class ConversationLogActivity : AppCompatActivity() {
         messages_recycler_view.layoutManager = linearLayoutManager
     }
 
+    private fun sendMessage(messageText: String) {
+
+        if (messageText.isEmpty()) return
+
+        val docRef = firestore.collection("messages").document()
+        val message = Message(
+            id = docRef.id,
+            conversationId = conversation.id,
+            sender = conversation.user.uid,
+            receiver = conversation.other.uid,
+            type = Message.Type.TO,
+            content = messageText,
+            seen = false,
+            duration = 10,
+            sentOn = Timestamp.now(),
+            seenOn = null,
+            deleteOn = null
+        )
+
+        docRef.set(message).addOnCompleteListener {
+            firestore.collection("conversations").document(conversation.id!!)
+                .update("messages", FieldValue.arrayUnion(message.id))
+        }
+
+        conversation.messages.add(message)
+        adapter.notifyDataSetChanged()
+        messages_recycler_view.scrollToPosition(conversation.messages.lastIndex)
+        message_edit_text.text.clear()
+
+    }
+
+    private fun sendEmail() {
+        val emailIntent = Intent(
+            Intent.ACTION_SENDTO,
+            Uri.fromParts("mailto", "${conversation.other.email}", null)
+        )
+        val appName = resources.getString(R.string.app_name)
+        val subject = "[$appName] Attachment from ${conversation.user.username}"
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        startActivity(Intent.createChooser(emailIntent, "Send email..."))
+    }
+
     private fun initConversationListener() {
 
-        registrationListener = firestore.collection("messages")
+        messagesListener = firestore.collection("messages")
             .whereEqualTo("conversationId", conversation.id)
             .addSnapshotListener { snapshots, e ->
-                if (e != null || isFirstTime) {
-                    isFirstTime = false
+                if (e != null || initialLoad) {
+                    initialLoad = false
                     return@addSnapshotListener
                 }
                 for (dc in snapshots!!.documentChanges) {
-
                     val message = dc.document.toObject(Message::class.java)
-                    val i = conversation.getMessageIndex(message.id!!)
-
-                    when {
-                        dc.type == DocumentChange.Type.ADDED -> fetchNewMessage(message)
-                        dc.type == DocumentChange.Type.MODIFIED -> updateMessageData(i, message)
-                        dc.type == DocumentChange.Type.REMOVED -> removeMessage(i)
+                    when (dc.type) {
+                        ADDED -> addNewMessage(message)
+                        MODIFIED -> updateMessage(message)
+                        REMOVED -> removeMessage(message)
                     }
                 }
             }
+
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun fetchNewMessage(message: Message) {
-        val isSenderCurrentUser = message.sender == conversation.user.uid
-        if (isSenderCurrentUser) {
-            return
-        }
+    private fun addNewMessage(message: Message) {
+
+        if (!message.isFromOther(conversation.other.uid!!)) return
         message.markAsSeen()
         firestore.collection("messages").document(message.id!!).set(message)
-        message.type = Message.Type.FROM
+        message.determineType(conversation.other.uid!!)
+
         conversation.messages.add(message)
-        messages_recycler_view.scrollToPosition(adapter.itemCount - 1)
         adapter.notifyDataSetChanged()
+        messages_recycler_view.scrollToPosition(conversation.messages.lastIndex)
+
     }
 
-    private fun updateMessageData(index: Int, newMessage: Message) {
-        if (newMessage.sender == conversation.other.uid) {
-            newMessage.type = Message.Type.FROM
-        }
+    private fun updateMessage(newMessage: Message) {
+        newMessage.determineType(conversation.other.uid!!)
+        val index = conversation.getMessageIndex(newMessage.id!!)
         conversation.messages[index] = newMessage
         adapter.notifyItemChanged(index)
     }
 
-    private fun removeMessage(index: Int) {
+    private fun removeMessage(message: Message) {
+        val index = conversation.getMessageIndex(message.id!!)
         conversation.messages.removeAt(index)
         adapter.notifyItemRemoved(index)
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        registrationListener.remove()
+        messagesListener.remove()
     }
-
 }
+

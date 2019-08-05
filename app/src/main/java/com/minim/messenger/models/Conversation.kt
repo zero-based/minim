@@ -2,7 +2,6 @@ package com.minim.messenger.models
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.google.firebase.Timestamp
 
 data class Conversation(
     val id: String? = null,
@@ -24,50 +23,7 @@ data class Conversation(
         }
     )
 
-    fun processMessages() {
-        categorizeMessages()
-        deleteOverDueMessages()
-        markSeenMessages()
-        messages.sortBy { it.sentOn }
-    }
-
-    private fun categorizeMessages() {
-        messages.filter { m ->
-            m.sender == other.uid
-        }.forEach { m ->
-            m.type = Message.Type.FROM
-        }
-    }
-
-    fun getOtherUnseenMessages(): List<Message> {
-        return messages.filter {
-            it.sender == other.uid && it.seen == false
-        }
-    }
-
-    private fun markSeenMessages() {
-        getOtherUnseenMessages().forEach {
-            it.seen = true
-            it.seenOn = Timestamp.now()
-        }
-    }
-
-    fun getOverDueMessages(): List<Message> {
-        return messages.filter {
-            it.deleteOn != null && it.deleteOn!! < Timestamp.now()
-        }
-    }
-
-    private fun deleteOverDueMessages() {
-        getOverDueMessages().forEach { messages.remove(it) }
-    }
-
-    fun getMessageIndex(messageId: String): Int {
-        return messages.indexOfFirst {
-            it.id == messageId
-        }
-
-    }
+    fun getMessageIndex(messageId: String) = messages.indexOfFirst { it.id == messageId }
 
     constructor(parcel: Parcel) : this(
         parcel.readString(),
