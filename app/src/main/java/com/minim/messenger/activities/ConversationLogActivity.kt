@@ -14,6 +14,7 @@ import com.minim.messenger.R
 import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
+import com.minim.messenger.util.Security
 import kotlinx.android.synthetic.main.activity_conversation_log.*
 
 class ConversationLogActivity : AppCompatActivity() {
@@ -66,15 +67,16 @@ class ConversationLogActivity : AppCompatActivity() {
             deleteOn = null
         )
 
-        docRef.set(message).addOnCompleteListener {
-            firestore.collection("conversations").document(conversation.id!!)
-                .update("messages", FieldValue.arrayUnion(message.id))
-        }
-
         conversation.messages.add(message)
         adapter.notifyDataSetChanged()
         messages_recycler_view.scrollToPosition(conversation.messages.lastIndex)
         message_edit_text.text.clear()
+
+        val encryptedMessage = message.copy(content = Security.encrypt(messageText))
+        docRef.set(encryptedMessage).addOnCompleteListener {
+            firestore.collection("conversations").document(conversation.id!!)
+                .update("messages", FieldValue.arrayUnion(message.id))
+        }
 
     }
 
@@ -102,7 +104,7 @@ class ConversationLogActivity : AppCompatActivity() {
                     val message = dc.document.toObject(Message::class.java)
                     when (dc.type) {
                         ADDED -> addNewMessage(message)
-                        MODIFIED -> updateMessage(message)
+                        MODIFIED -> updateMessageSeen(message)
                         REMOVED -> removeMessage(message)
                     }
                 }
@@ -115,7 +117,9 @@ class ConversationLogActivity : AppCompatActivity() {
         if (!message.isFromOther(conversation.other.uid!!)) return
         message.markAsSeen()
         firestore.collection("messages").document(message.id!!).set(message)
+
         message.determineType(conversation.other.uid!!)
+        message.content = Security.decrypt(message.content!!)
 
         conversation.messages.add(message)
         adapter.notifyDataSetChanged()
@@ -123,10 +127,13 @@ class ConversationLogActivity : AppCompatActivity() {
 
     }
 
-    private fun updateMessage(newMessage: Message) {
+    private fun updateMessageSeen(newMessage: Message) {
         newMessage.determineType(conversation.other.uid!!)
         val index = conversation.getMessageIndex(newMessage.id!!)
-        conversation.messages[index] = newMessage
+        val message = conversation.messages[index]
+        message.seen = newMessage.seen
+        message.seenOn = newMessage.seenOn
+        message.deleteOn = newMessage.deleteOn
         adapter.notifyItemChanged(index)
     }
 

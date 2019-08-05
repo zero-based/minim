@@ -16,6 +16,7 @@ import com.minim.messenger.activities.ConversationLogActivity
 import com.minim.messenger.activities.ConversationsActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
+import com.minim.messenger.util.Security
 
 class ConversationsAdapter(private val context: Context, val conversations: ArrayList<Conversation>) :
     RecyclerView.Adapter<ConversationsAdapter.ContactHolder>(), Filterable {
@@ -42,6 +43,7 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         holder.parentLayout.setOnClickListener {
 
             conversation.messages.clear()
+            Security.setKey(conversation.secret!!)
 
             firestore.collection("messages")
                 .whereEqualTo("conversationId", conversation.id)
@@ -55,7 +57,9 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                         } else {
                             updateMessageSeen(conversation, message)
                             message.determineType(conversation.other.uid!!)
-                            conversation.messages.add(message)
+                            conversation.messages.add(message.also { m ->
+                                m.content = Security.decrypt(m.content!!)
+                            })
                         }
                     }
                 }.addOnCompleteListener {
