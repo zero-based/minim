@@ -23,6 +23,16 @@ data class Message(
         FROM
     }
 
+    fun isOverdue() = deleteOn != null && deleteOn!! < Timestamp.now()
+
+    fun isFromOther(otherUid: String) = sender == otherUid
+
+    fun determineType(otherUid: String) {
+        if (isFromOther(otherUid)) {
+            type = Type.FROM
+        }
+    }
+
     fun markAsSeen() {
         seen = true
         seenOn = Timestamp.now()
