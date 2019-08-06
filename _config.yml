@@ -3,8 +3,6 @@ app_name                           : minim
 app_description                    : Rethinking what a chat app means.
 github_link                        : https://github.com/MichaelSafwatHanna/minim
 app_icon                           : https://raw.githubusercontent.com/MichaelSafwatHanna/minim/master/app/src/main/ic_launcher-web.png
-enable_smart_app_banner            : true
-
 
 
 # Feature List
