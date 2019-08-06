@@ -1,99 +1,73 @@
 #page title
-app_name                                  : minim
-app_description                           : Your minimal chat app.
-github_link                               : https://github.com/MichaelSafwatHanna/minim
-app_icon                                  : https://raw.githubusercontent.com/MichaelSafwatHanna/minim/master/app/src/main/ic_launcher-web.png
-enable_smart_app_banner                   : true
+app_name                           : minim
+app_description                    : Rethinking what a chat app means.
+github_link                        : https://github.com/MichaelSafwatHanna/minim
+app_icon                           : https://raw.githubusercontent.com/MichaelSafwatHanna/minim/master/app/src/main/ic_launcher-web.png
+enable_smart_app_banner            : true
 
 
 
-# Feature List                            Edit, add or remove features to be presented.
-features                                  :
+# Feature List
+features                           :
 
-  - title                                 : Minimal Design
-    description                           : Minimalism is all about living with less and excluding all distraction.
-    fontawesome_icon_name                 : square
+  - title                          : Minimal Design
+    description                    : Designed to be used as little as possible by cutting off the overwhelming features.
+    icon                           : square
     
-  - title                                 : Secure
-    description                           : All messeges are encrypted with AES using shared private key.
-    fontawesome_icon_name                 : lock
+  - title                          : Fully Encrypted
+    description                    : Messages are encrypted using Advanced Encryption Standard with a shared private key.
+    icon                           : lock
 
-  - title                                 : Phone Authentication
-    description                           : No more forgetting about your password, all what you need is your phone number.
-    fontawesome_icon_name                 : phone
+  - title                          : Phone Authentication
+    description                    : No more forgetting about your password, all what you need is your phone number.
+    icon                           : phone
 
-  - title                                 : Auto-destructive Messages
-    description                           : Messages delete themselves after 24 hours for maximum to help you not cling to the past.
-    fontawesome_icon_name                 : clock
+  - title                          : Auto-destructive Messages
+    description                    : We help you move on and let go of the past by destructing messages after 24 hours maximum.
+    icon                           : clock
 
-  - title                                 : Nonaddictive Messages
-    description                           : Messages are limited to 120 characters, made to be informative not addictive.
-    fontawesome_icon_name                 : syringe
+  - title                          : Nonaddictive Messages
+    description                    : Messages are limited to 120 characters, made to be informative not addictive.
+    icon                           : syringe
   
-  - title                                 : Email Attachments
-    description                           : Back to basics, that's what email was made for.
-    fontawesome_icon_name                 : envelope
+  - title                          : Email Attachments
+    description                    : Going back to basics, isn't that what email was really made for?
+    icon                           : envelope
   
-  - title                                 : Ad. Free
-    description                           : Annoying ads only exist in other apps, not ours.
-    fontawesome_icon_name                 : dollar-sign
+  - title                          : Free & Without Ads
+    description                    : Annoying ads only exist in other apps, not ours. Once you go minimal, you can never go back.
+    icon                           : dollar-sign
 
-  - title                                 : Open Source
-    description                           : You are free to contribute to the project and check the source code yourself.
-    fontawesome_icon_name                 : code-branch
+  - title                          : Open Source
+    description                    : Source code is shared on GitHub, open for contributions. We have nothing to hide.
+    icon                           : code-branch
   
-  - title                                 : Made with Love
-    description                           : zero-based ♥ minim.
-    fontawesome_icon_name                 : heart
+  - title                          : Made with Love
+    description                    : Encourages you to spend quality time doing the things you love the most, free of distraction.
+    icon                           : heart
 
 
 # Theme Settings
-topbar_color                              : "#000000"
-topbar_transparency                       : 0.1
-topbar_title_color                        : "#ffffff"
+topbar_color                       : "#000000"
+topbar_transparency                : 0.1
+topbar_title_color                 : "#ffffff"
 
-cover_image                               : https://66.media.tumblr.com/a4894c9cbf914fe616789dd91aab4fee/tumblr_o33vcw2dBO1u1rcako1_1280.jpg
-cover_overlay_color                       : "#000000"
-cover_overlay_transparency                : 0.7
+cover_image                        : https://66.media.tumblr.com/a4894c9cbf914fe616789dd91aab4fee/tumblr_o33vcw2dBO1u1rcako1_1280.jpg
+cover_overlay_color                : "#000000"
+cover_overlay_transparency         : 0.7
 
-device_color                              : black
+device_color                       : black
 
-body_background_color                     : "#000000"
+body_background_color              : "#000000"
 
-link_color                                : "#1d63ea"
+link_color                         : "#1d63ea"
 
-app_title_color                           : "#ffffff"
-app_price_color                           : "#ffffff"
-app_description_color                     : "#ffffff"
+app_title_color                    : "#ffffff"
+app_price_color                    : "#ffffff"
+app_description_color              : "#ffffff"
 
-feature_title_color                       : "#ffffff"
-feature_text_color                        : "#eeeeee"
+feature_title_color                : "#ffffff"
+feature_text_color                 : "#eeeeee"
 
-feature_icons_foreground_color            : "#000000"
-feature_icons_background_color            : "#ffffff"
-
-
-
-
-
-
-
-
-
-
-
-
-
-####################################################
-### Jekyll Configuration. No need to touch this. ###
-####################################################
-
-# Set the Sass partials directory, as we're using @imports
-sass:
-  style: :compressed # You might prefer to minify using :compressed
-
-# Exclude these files from your production _site
-exclude:
-  - LICENSE
-  - README.md
-  - CNAME
+feature_icons_foreground_color     : "#000000"
+feature_icons_background_color     : "#ffffff"
