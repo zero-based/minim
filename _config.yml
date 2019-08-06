@@ -1,9 +1,8 @@
 #page title
 app_name                           : minim
 app_description                    : Rethinking what a chat app means.
-github_link                        : https://github.com/MichaelSafwatHanna/minim
 app_icon                           : https://raw.githubusercontent.com/MichaelSafwatHanna/minim/master/app/src/main/ic_launcher-web.png
-
+repository                         : MichaelSafwatHanna/minim
 
 # Feature List
 features                           :
@@ -37,7 +36,7 @@ features                           :
     icon                           : dollar-sign
 
   - title                          : Open Source
-    description                    : Source code is shared on GitHub, open for contributions. We have nothing to hide.
+    description                    : Source code is shared on <a href="https://github.com/MichaelSafwatHanna/minim">GitHub</a>, open for contributions. We have nothing to hide.
     icon                           : code-branch
   
   - title                          : Made with Love

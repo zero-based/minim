@@ -13,6 +13,12 @@
     </p>
   </div>
   <div class="downloadButtonsContainer">
-    <a class="githubLink" href="{{ site.github_link }}"><img class="github" src="assets/github.png"></a>
+    {%- assign latest_release = site.github.releases | first -%}
+    <a class="githubLink" href="{{ latest_release.assets[0].browser_download_url }}">
+      <img class="github" src="assets/github.png">
+    </a>
+    <small class="appVersion">
+      {{ latest_release.name }}
+    </small>
   </div>
 </div>

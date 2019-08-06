@@ -125,9 +125,18 @@
 }
 
 .downloadButtonsContainer {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-top: 42px;
   filter: $drop-shadow;
+}
+
+.appVersion {
+  color: $feature_text_color;
+  font-family: monospace;
+  margin-top: 8px;
 }
 
 @media only screen and (max-width: 992px) {
@@ -138,21 +147,6 @@
 
 .github {
   height: 75px;
-  margin-right: 24px;
-}
-
-@media only screen and (max-width: 992px) {
-  .github {
-    margin-right: 24px;
-    margin-bottom: 0px;
-  }
-}
-
-@media only screen and (max-width: 528px) {
-  .github {
-    margin-right: 0px;
-    margin-bottom: 24px;
-  }
 }
 
 // iPhone Device Preview
