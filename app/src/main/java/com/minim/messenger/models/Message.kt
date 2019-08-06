@@ -3,6 +3,7 @@ package com.minim.messenger.models
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 
 data class Message(
     var id: String? = null,
@@ -10,7 +11,7 @@ data class Message(
     val sender: String? = null,
     val receiver: String? = null,
     var type: Type? = null,
-    val content: String? = null,
+    var content: String? = null,
     var seen: Boolean? = null,
     val duration: Long? = null,
     val sentOn: Timestamp? = null,
@@ -23,6 +24,7 @@ data class Message(
         FROM
     }
 
+    @Exclude
     fun isOverdue() = deleteOn != null && deleteOn!! < Timestamp.now()
 
     fun isFromOther(otherUid: String) = sender == otherUid

@@ -14,12 +14,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange.Type.*
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import com.minim.messenger.models.User
+import com.minim.messenger.util.Security
+import com.minim.messenger.util.SharedPrefHelper
 import kotlinx.android.synthetic.main.activity_conversations.*
 
 class ConversationsActivity : AppCompatActivity() {
@@ -93,7 +96,8 @@ class ConversationsActivity : AppCompatActivity() {
 
                 val docRef = firestore.collection("conversations").document()
                 val contact = it.result!!.documents.first().toObject(User::class.java)!!
-                val conversation = Conversation(docRef.id, arrayListOf(currentUser, contact))
+                val secret = Security.getRandomString()
+                val conversation = Conversation(docRef.id, secret, arrayListOf(currentUser, contact))
                 docRef.set(conversation.document)
 
             }
@@ -112,7 +116,7 @@ class ConversationsActivity : AppCompatActivity() {
                 val changes = querySnapshot.documentChanges
                 for ((i, dc) in changes.withIndex()) {
                     when (dc.type) {
-                        ADDED -> fetchContacts(dc.document, i == changes.lastIndex)
+                        ADDED -> addConversation(dc.document, i == changes.lastIndex)
                         MODIFIED -> newMessageNotification(dc.document)
                         REMOVED -> {
                         }
@@ -123,18 +127,30 @@ class ConversationsActivity : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun fetchContacts(document: DocumentSnapshot, isLast: Boolean) {
+    private fun addConversation(document: DocumentSnapshot, isLast: Boolean) {
 
-        val id = document.data!!["id"].toString()
-        val participants = document.data!!["participants"] as ArrayList<String>
-        val otherUid = participants.find { it != currentUser.uid }!!
+        val conversation = Conversation(document.data!!, currentUser)
+        val creatorUid = (document.data!!["participants"] as ArrayList<String>).first()
+
+        val id = conversation.id!!
+        if (conversation.secret.isNullOrEmpty()) {
+            conversation.secret = SharedPrefHelper.getString(this, id)
+        } else {
+            SharedPrefHelper.addString(this, id, conversation.secret!!)
+            if (creatorUid != currentUser.uid) {
+                // To make sure that the user who created the
+                // conversation doesn't delete the secret
+                // before the other save it on his phone.
+                firestore.collection("conversations").document(id)
+                    .update(hashMapOf<String, Any>("secret" to FieldValue.delete()))
+            }
+        }
 
         firestore.collection("users")
-            .document(otherUid)
+            .document(conversation.other.uid!!)
             .get()
             .addOnSuccessListener {
-                val contact = it.toObject(User::class.java)!!
-                val conversation = Conversation(id, arrayListOf(currentUser, contact))
+                conversation.initOther(it.toObject(User::class.java)!!)
                 adapter.conversations.add(conversation)
             }.addOnCompleteListener {
                 if (isLast) {
@@ -142,6 +158,7 @@ class ConversationsActivity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                 }
             }
+
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -162,11 +179,13 @@ class ConversationsActivity : AppCompatActivity() {
                 return@addOnSuccessListener
             }
             val id = document.data!!["id"].toString()
-            val index = adapter.conversations.indexOfFirst { c -> c.id == id }
-            adapter.conversations[index].hasChanges = true
+            val index = conversations.indexOfFirst { c -> c.id == id }
+            val conversation = conversations[index]
+            Security.setKey(conversation.secret!!)
+            message.also { m -> m.content = Security.decrypt(m.content!!) }
+            pushNotification(message, conversation.other.username!!, index)
+            conversation.hasChanges = true
             adapter.notifyItemChanged(index)
-            val other = adapter.conversations[index].participants.find { u -> u.uid == message.sender }!!
-            pushNotification(message, other.username!!, index)
         }
 
     }
