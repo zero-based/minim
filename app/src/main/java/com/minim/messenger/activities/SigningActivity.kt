@@ -72,7 +72,7 @@ class SigningActivity : AppCompatActivity() {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener {
                 val isNewUser = it.result?.additionalUserInfo!!.isNewUser
                 val destination = if (isNewUser) {
-                    SettingsActivity::class.java
+                    ProfileActivity::class.java
                 } else {
                     ConversationsActivity::class.java
                 }
