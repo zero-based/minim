@@ -57,7 +57,14 @@ class ConversationsActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) = Unit
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                adapter.filter.filter(s.toString())
+                val query = s.toString()
+                adapter.filter.filter(query) {
+                    if (query == currentUser.username || adapter.itemCount != 0 || query.isEmpty()) {
+                        add_contact_button.visibility = View.GONE
+                    } else {
+                        add_contact_button.visibility = View.VISIBLE
+                    }
+                }
             }
         })
 
@@ -69,18 +76,7 @@ class ConversationsActivity : AppCompatActivity() {
         contacts_recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
-
-    private fun contactExists(username: String): Boolean {
-        conversations.find { it.other.username.equals(username) } ?: return false
-        return true
-    }
-
     private fun addContact(username: String) {
-
-        if (contactExists(username) || username == currentUser.username) {
-            search_edit_text.error = "Contact already exists"
-            return
-        }
 
         firestore.collection("users")
             .whereEqualTo("username", username)
@@ -88,6 +84,7 @@ class ConversationsActivity : AppCompatActivity() {
             .addOnSuccessListener {
 
                 if (it.isEmpty) {
+                    add_contact_button.visibility = View.GONE
                     search_edit_text.error = "User not found"
                     return@addOnSuccessListener
                 }
