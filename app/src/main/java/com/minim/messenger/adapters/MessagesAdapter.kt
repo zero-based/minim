@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.minim.messenger.R
 import com.minim.messenger.models.Message
 
-class MessagesAdapter(val messages: ArrayList<Message>) :
+class MessagesAdapter(private val messages: ArrayList<Message>) :
     RecyclerView.Adapter<MessagesAdapter.MessageHolder>() {
 
     override fun getItemCount() = messages.size

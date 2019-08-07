@@ -56,9 +56,8 @@ class ConversationsAdapter(private val context: Activity, val conversations: Arr
                         } else {
                             updateMessageSeen(conversation, message)
                             message.determineType(conversation.other.uid!!)
-                            conversation.messages.add(message.also { m ->
-                                m.content = Security.decrypt(m.content!!)
-                            })
+                            message.decrypt()
+                            conversation.messages.add(message)
                         }
                     }
                     dismissExistingNotification(holder, conversation, position)

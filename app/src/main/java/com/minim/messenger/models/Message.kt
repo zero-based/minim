@@ -4,17 +4,20 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
+import com.minim.messenger.util.Security
+import java.util.concurrent.TimeUnit
 
 data class Message(
     var id: String? = null,
     var conversationId: String? = null,
     val sender: String? = null,
     val receiver: String? = null,
-    var type: Type? = null,
+    @get:Exclude @set:Exclude
+    var type: Type? = Type.TO,
     var content: String? = null,
-    var seen: Boolean? = null,
-    val duration: Long? = null,
-    val sentOn: Timestamp? = null,
+    var seen: Boolean? = false,
+    val duration: Long? = TimeUnit.HOURS.toSeconds(24),
+    val sentOn: Timestamp? = Timestamp.now(),
     var seenOn: Timestamp? = null,
     var deleteOn: Timestamp? = null
 ) : Parcelable {
@@ -30,8 +33,10 @@ data class Message(
     fun isFromOther(otherUid: String) = sender == otherUid
 
     fun determineType(otherUid: String) {
-        if (isFromOther(otherUid)) {
-            type = Type.FROM
+        type = if (isFromOther(otherUid)) {
+            Type.FROM
+        } else {
+            Type.TO
         }
     }
 
@@ -39,6 +44,14 @@ data class Message(
         seen = true
         seenOn = Timestamp.now()
         deleteOn = Timestamp(seenOn!!.seconds + duration!!, 0)
+    }
+
+    fun encrypt() {
+        content = Security.encrypt(content!!)
+    }
+
+    fun decrypt() {
+        content = Security.decrypt(content!!)
     }
 
     constructor(parcel: Parcel) : this(
