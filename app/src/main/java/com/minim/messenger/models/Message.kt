@@ -5,7 +5,6 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
 import com.minim.messenger.util.Security
-import java.util.concurrent.TimeUnit
 
 data class Message(
     var id: String? = null,
@@ -16,7 +15,7 @@ data class Message(
     var type: Type? = Type.TO,
     var content: String? = null,
     var seen: Boolean? = false,
-    val duration: Long? = TimeUnit.HOURS.toSeconds(24),
+    val duration: Long? = null,
     val sentOn: Timestamp? = Timestamp.now(),
     var seenOn: Timestamp? = null,
     var deleteOn: Timestamp? = null

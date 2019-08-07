@@ -8,4 +8,8 @@
         <item name="colorAccent">#484848</item>
     </style>
 
+    <style name="AppTheme.Picker">
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
 </resources>
