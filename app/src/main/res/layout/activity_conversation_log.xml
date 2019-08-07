@@ -29,6 +29,7 @@
     <LinearLayout android:id="@+id/input_linear_layout"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:orientation="horizontal"
                   android:padding="16dp"
                   android:gravity="center"
                   app:layout_constraintBottom_toBottomOf="parent"
@@ -53,12 +54,44 @@
                   android:maxLines="2"
                   android:textColorHint="@android:color/tertiary_text_dark"
                   android:textColor="@android:color/white"
-                  android:inputType="textMultiLine"
+                  android:inputType="textMultiLine|textCapSentences"
                   android:background="@drawable/rounded_container"/>
 
+        <me.angrybyte.numberpicker.view.ActualNumberPicker
+                android:id="@+id/duration_value_picker"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:text_size="16sp"
+                app:bar_width="1dp"
+                app:bars_count="16"
+                android:background="@android:color/transparent"
+                app:bar_color="@color/colorAccent"
+                app:highlight_color="@color/colorPrimary"
+                app:selection_color="@android:color/white"
+                app:text_color="@android:color/white"
+                app:show_bars="true"
+                app:show_text="true"
+                android:visibility="gone"
+                app:show_controls="false"
+                app:show_fast_controls="false"/>
+
+        <NumberPicker android:id="@+id/duration_unit_picker"
+                      android:layout_width="wrap_content"
+                      android:layout_height="match_parent"
+                      android:layout_marginStart="8dp"
+                      android:layout_marginEnd="8dp"
+                      android:visibility="gone"
+                      android:descendantFocusability="blocksDescendants"
+                      android:theme="@style/AppTheme.Picker">
+
+        </NumberPicker>
+
         <ImageButton android:id="@+id/send_button"
-                     android:layout_width="40dp"
-                     android:layout_height="40dp"
+                     android:layout_width="48dp"
+                     android:layout_height="48dp"
                      android:src="@drawable/send_icon"
                      android:background="@drawable/rounded_container"/>
 
