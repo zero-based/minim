@@ -27,7 +27,9 @@ object Navigation {
             intent.putExtra(parableExtra.first, parableExtra.second)
         }
         activity.startActivity(intent)
-        activity.finish()
+        if (clearTop) {
+            activity.finish()
+        }
     }
 
     fun sendEmail(activity: Activity, to: String, subject: String) {
