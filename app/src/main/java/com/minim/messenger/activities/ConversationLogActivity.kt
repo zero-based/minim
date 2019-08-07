@@ -3,7 +3,6 @@ package com.minim.messenger.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentChange.Type.*
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,7 +12,6 @@ import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import com.minim.messenger.util.Navigation
-import com.minim.messenger.util.Security
 import kotlinx.android.synthetic.main.activity_conversation_log.*
 
 class ConversationLogActivity : AppCompatActivity() {
@@ -57,13 +55,7 @@ class ConversationLogActivity : AppCompatActivity() {
             conversationId = conversation.id,
             sender = conversation.user.uid,
             receiver = conversation.other.uid,
-            type = Message.Type.TO,
-            content = messageText,
-            seen = false,
-            duration = 10,
-            sentOn = Timestamp.now(),
-            seenOn = null,
-            deleteOn = null
+            content = messageText
         )
 
         conversation.messages.add(message)
@@ -71,7 +63,7 @@ class ConversationLogActivity : AppCompatActivity() {
         messages_recycler_view.scrollToPosition(conversation.messages.lastIndex)
         message_edit_text.text.clear()
 
-        val encryptedMessage = message.copy(content = Security.encrypt(messageText))
+        val encryptedMessage = message.copy().also { it.encrypt() }
         docRef.set(encryptedMessage).addOnCompleteListener {
             firestore.collection("conversations").document(conversation.id!!)
                 .update("messages", FieldValue.arrayUnion(message.id))
@@ -113,7 +105,7 @@ class ConversationLogActivity : AppCompatActivity() {
         firestore.collection("messages").document(message.id!!).set(message)
 
         message.determineType(conversation.other.uid!!)
-        message.content = Security.decrypt(message.content!!)
+        message.decrypt()
 
         conversation.messages.add(message)
         adapter.notifyDataSetChanged()

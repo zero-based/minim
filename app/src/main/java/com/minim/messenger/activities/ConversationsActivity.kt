@@ -186,7 +186,7 @@ class ConversationsActivity : AppCompatActivity() {
             val index = conversations.indexOfFirst { c -> c.id == id }
             val conversation = conversations[index]
             Security.setKey(conversation.secret!!)
-            message.also { m -> m.content = Security.decrypt(m.content!!) }
+            message.decrypt()
             pushNotification(message, conversation.other.username!!, index)
             conversation.hasChanges = true
             adapter.notifyItemChanged(index)
