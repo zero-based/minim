@@ -23,6 +23,7 @@ import com.minim.messenger.models.Message
 import com.minim.messenger.models.User
 import com.minim.messenger.util.Security
 import com.minim.messenger.util.SharedPrefHelper
+import com.minim.messenger.util.Validation
 import kotlinx.android.synthetic.main.activity_conversations.*
 
 class ConversationsActivity : AppCompatActivity() {
@@ -43,8 +44,10 @@ class ConversationsActivity : AppCompatActivity() {
         initConversationListeners()
 
         add_contact_button.setOnClickListener {
-            if (ProfileActivity().isUsernameValid(this, search_edit_text)) {
+            if (Validation.isUsernameValid(this, search_edit_text)) {
                 addContact(search_edit_text.text.toString())
+            } else {
+                add_contact_button.visibility = View.GONE
             }
         }
 
