@@ -12,4 +12,5 @@
     <string name="update">Update Info</string>
     <string name="delete_account">Delete Account</string>
     <string name="sign_out">Sign Out</string>
+    <string name="help">Help</string>
 </resources>

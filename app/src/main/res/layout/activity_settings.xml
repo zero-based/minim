@@ -41,6 +41,14 @@
                 android:background="@drawable/rounded_container"
                 android:textColor="@android:color/white"/>
 
+        <Button android:id="@+id/help_button"
+                android:layout_width="256dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/help"
+                android:background="@drawable/rounded_container"
+                android:textColor="@android:color/white"/>
+
         <Button android:id="@+id/delete_button"
                 android:layout_width="256dp"
                 android:layout_height="wrap_content"
