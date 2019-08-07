@@ -13,9 +13,9 @@ import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange.Type.*
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.minim.messenger.R
 import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.models.Conversation
@@ -84,18 +84,19 @@ class ConversationsActivity : AppCompatActivity() {
 
         firestore.collection("users")
             .whereEqualTo("username", username)
-            .get().addOnCompleteListener {
+            .get()
+            .addOnSuccessListener {
 
-                if (it.result!!.isEmpty) {
+                if (it.isEmpty) {
                     search_edit_text.error = "User not found"
-                    return@addOnCompleteListener
+                    return@addOnSuccessListener
                 }
 
                 search_edit_text.text.clear()
                 search_edit_text.clearFocus()
 
                 val docRef = firestore.collection("conversations").document()
-                val contact = it.result!!.documents.first().toObject(User::class.java)!!
+                val contact = it.documents.first().toObject(User::class.java)!!
                 val secret = Security.getRandomString()
                 val conversation = Conversation(docRef.id, secret, arrayListOf(currentUser, contact))
                 docRef.set(conversation.document)
@@ -105,6 +106,7 @@ class ConversationsActivity : AppCompatActivity() {
     }
 
     private fun initConversationListeners() {
+
         firestore.collection("conversations")
             .whereArrayContains("participants", currentUser.uid!!)
             .addSnapshotListener { querySnapshot, _ ->
@@ -114,9 +116,11 @@ class ConversationsActivity : AppCompatActivity() {
                 }
 
                 val changes = querySnapshot.documentChanges
-                for ((i, dc) in changes.withIndex()) {
+                val newSize = conversations.size + changes.count { it.type == ADDED }
+
+                for (dc in changes) {
                     when (dc.type) {
-                        ADDED -> addConversation(dc.document, i == changes.lastIndex)
+                        ADDED -> addConversation(dc.document, newSize)
                         MODIFIED -> newMessageNotification(dc.document)
                         REMOVED -> {
                         }
@@ -127,10 +131,10 @@ class ConversationsActivity : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun addConversation(document: DocumentSnapshot, isLast: Boolean) {
+    private fun addConversation(document: QueryDocumentSnapshot, newSize: Int) {
 
-        val conversation = Conversation(document.data!!, currentUser)
-        val creatorUid = (document.data!!["participants"] as ArrayList<String>).first()
+        val conversation = Conversation(document.data, currentUser)
+        val creatorUid = (document.data["participants"] as ArrayList<String>).first()
 
         val id = conversation.id!!
         if (conversation.secret.isNullOrEmpty()) {
@@ -151,10 +155,10 @@ class ConversationsActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener {
                 conversation.initOther(it.toObject(User::class.java)!!)
-                adapter.conversations.add(conversation)
-            }.addOnCompleteListener {
-                if (isLast) {
+                conversations.add(conversation)
+                if (conversations.size == newSize) { // Last addition
                     contacts_progress_bar.visibility = View.GONE
+                    conversations.sortBy { c -> c.other.username }
                     adapter.notifyDataSetChanged()
                 }
             }
@@ -162,9 +166,9 @@ class ConversationsActivity : AppCompatActivity() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun newMessageNotification(document: DocumentSnapshot) {
+    private fun newMessageNotification(document: QueryDocumentSnapshot) {
 
-        val messagesIds = document.data!!["messages"] as ArrayList<String>
+        val messagesIds = document.data["messages"] as ArrayList<String>
         if (messagesIds.isEmpty()) {
             return
         }
@@ -178,7 +182,7 @@ class ConversationsActivity : AppCompatActivity() {
             if (message.sender == currentUser.uid) {
                 return@addOnSuccessListener
             }
-            val id = document.data!!["id"].toString()
+            val id = document.data["id"].toString()
             val index = conversations.indexOfFirst { c -> c.id == id }
             val conversation = conversations[index]
             Security.setKey(conversation.secret!!)
@@ -191,6 +195,7 @@ class ConversationsActivity : AppCompatActivity() {
     }
 
     private fun pushNotification(message: Message, sender: String, index: Int) {
+
         val intent = Intent(this, ConversationsActivity::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -204,8 +209,10 @@ class ConversationsActivity : AppCompatActivity() {
             .setAutoCancel(true)
             .setSound(alarmSound)
             .build()
+
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(index, builder)
+
     }
 
     override fun onResume() {
