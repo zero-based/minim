@@ -21,6 +21,7 @@ import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import com.minim.messenger.models.User
+import com.minim.messenger.util.Navigation
 import com.minim.messenger.util.Security
 import com.minim.messenger.util.SharedPrefHelper
 import com.minim.messenger.util.Validation
@@ -52,8 +53,7 @@ class ConversationsActivity : AppCompatActivity() {
         }
 
         settings_button.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            Navigation.start(this, SettingsActivity::class.java)
         }
 
         search_edit_text.addTextChangedListener(object : TextWatcher {

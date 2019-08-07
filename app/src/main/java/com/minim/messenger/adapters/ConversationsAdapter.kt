@@ -1,9 +1,8 @@
 package com.minim.messenger.adapters
 
+import android.app.Activity
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +14,10 @@ import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationLogActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
+import com.minim.messenger.util.Navigation
 import com.minim.messenger.util.Security
 
-class ConversationsAdapter(private val context: Context, val conversations: ArrayList<Conversation>) :
+class ConversationsAdapter(private val context: Activity, val conversations: ArrayList<Conversation>) :
     RecyclerView.Adapter<ConversationsAdapter.ContactHolder>(), Filterable {
 
     private var filteredConversations = conversations
@@ -62,7 +62,11 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                         }
                     }
                     dismissExistingNotification(holder, conversation, position)
-                    startConversation(conversation)
+                    Navigation.start(
+                        context,
+                        ConversationLogActivity::class.java,
+                        parableExtra = "conversation" to conversation
+                    )
                 }
 
         }
@@ -86,12 +90,6 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         holder.hasChanges.visibility = View.GONE
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(position)
-    }
-
-    private fun startConversation(conversation: Conversation) {
-        val intent = Intent(context, ConversationLogActivity::class.java)
-        intent.putExtra("conversation", conversation)
-        context.startActivity(intent)
     }
 
     override fun getFilter() = filteringStrategy

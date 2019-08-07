@@ -1,13 +1,13 @@
 package com.minim.messenger.activities
 
 import android.os.Bundle
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.models.User
+import com.minim.messenger.util.Navigation
 import com.minim.messenger.util.Validation
 import kotlinx.android.synthetic.main.activity_profile.*
 
@@ -48,7 +48,7 @@ class ProfileActivity : AppCompatActivity() {
                             .document(authUser.uid)
                             .set(User(authUser))
                             .addOnCompleteListener {
-                                SigningActivity.startActivity(this, ConversationsActivity::class.java)
+                                Navigation.start(this, ConversationsActivity::class.java, true)
                             }
                     }
                 }
