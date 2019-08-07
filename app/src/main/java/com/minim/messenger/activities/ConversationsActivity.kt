@@ -43,7 +43,7 @@ class ConversationsActivity : AppCompatActivity() {
         initConversationListeners()
 
         add_contact_button.setOnClickListener {
-            if (SettingsActivity().isUsernameValid(this, search_edit_text)) {
+            if (ProfileActivity().isUsernameValid(this, search_edit_text)) {
                 addContact(search_edit_text.text.toString())
             }
         }

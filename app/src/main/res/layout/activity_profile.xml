@@ -9,14 +9,13 @@
                   android:layout_height="wrap_content"
                   android:orientation="vertical"
                   android:layout_gravity="center"
-                  android:gravity="center"
-                  android:descendantFocusability="beforeDescendants"
-                  android:focusableInTouchMode="true">
+                  android:gravity="center">
 
         <EditText android:id="@+id/username_edit_text"
                   android:layout_width="256dp"
                   android:layout_height="wrap_content"
-                  android:layout_marginBottom="16dp"
+                  android:layout_marginTop="40dp"
+                  android:layout_marginBottom="24dp"
                   android:background="@drawable/rounded_container"
                   android:hint="@string/username"
                   android:inputType="textShortMessage"
@@ -26,33 +25,17 @@
         <EditText android:id="@+id/email_edit_text"
                   android:layout_width="256dp"
                   android:layout_height="wrap_content"
-                  android:layout_marginBottom="16dp"
+                  android:layout_marginBottom="24dp"
                   android:background="@drawable/rounded_container"
                   android:hint="@string/email"
                   android:inputType="textEmailAddress"
                   android:textColorHint="@android:color/tertiary_text_dark"
                   android:textColor="@android:color/white"/>
 
-        <Button android:id="@+id/update_button"
-                android:layout_width="256dp"
+        <Button android:id="@+id/save_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:text="@string/update"
-                android:background="@drawable/rounded_container"
-                android:textColor="@android:color/white"/>
-
-        <Button android:id="@+id/delete_button"
-                android:layout_width="256dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/delete_account"
-                android:background="@drawable/rounded_container"
-                android:textColor="@android:color/white"/>
-
-        <Button android:id="@+id/sign_out_button"
-                android:layout_width="256dp"
-                android:layout_height="wrap_content"
-                android:text="@string/sign_out"
+                android:text="@string/save"
                 android:background="@drawable/rounded_container"
                 android:textColor="@android:color/white"/>
 

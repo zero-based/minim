@@ -9,4 +9,7 @@
     <string name="type_a_message">Type a message</string>
     <string name="search_or_add">Search or add contacts</string>
     <string name="email">email</string>
+    <string name="update">Update Info</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="sign_out">Sign Out</string>
 </resources>
