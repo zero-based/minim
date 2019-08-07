@@ -215,20 +215,4 @@ class ConversationsActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (currentConversationIndex == -1) return
-        conversations[currentConversationIndex].hasChanges = false
-        adapter.notifyItemChanged(currentConversationIndex)
-    }
-
-    override fun finish() {
-        super.finish()
-        currentConversationIndex = -1
-    }
-
-    companion object {
-        var currentConversationIndex = -1
-    }
-
 }

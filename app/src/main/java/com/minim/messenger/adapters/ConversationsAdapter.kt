@@ -13,7 +13,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.minim.messenger.R
 import com.minim.messenger.activities.ConversationLogActivity
-import com.minim.messenger.activities.ConversationsActivity
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
 import com.minim.messenger.util.Security
@@ -62,8 +61,7 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
                             })
                         }
                     }
-                }.addOnCompleteListener {
-                    dismissExistingNotification(holder, position)
+                    dismissExistingNotification(holder, conversation, position)
                     startConversation(conversation)
                 }
 
@@ -83,8 +81,8 @@ class ConversationsAdapter(private val context: Context, val conversations: Arra
         firestore.collection("messages").document(message.id!!).set(message)
     }
 
-    private fun dismissExistingNotification(holder: ContactHolder, position: Int) {
-        ConversationsActivity.currentConversationIndex = position
+    private fun dismissExistingNotification(holder: ContactHolder, conversation: Conversation, position: Int) {
+        conversation.hasChanges = false
         holder.hasChanges.visibility = View.GONE
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(position)
