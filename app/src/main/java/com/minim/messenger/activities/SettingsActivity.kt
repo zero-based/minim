@@ -5,8 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.minim.messenger.R
 import kotlinx.android.synthetic.main.activity_settings.*
-import android.content.Intent
-import android.net.Uri
+import com.minim.messenger.util.Navigation
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -19,9 +18,7 @@ class SettingsActivity : AppCompatActivity() {
         update_button.setOnClickListener { notSupportedToast.show() }
         help_button.setOnClickListener {
             val url = "https://michaelsafwathanna.github.io/minim/"
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
-            startActivity(intent)
+            Navigation.openUrl(this, url)
         }
         delete_button.setOnClickListener { notSupportedToast.show() }
         sign_out_button.setOnClickListener { notSupportedToast.show() }

@@ -1,7 +1,6 @@
 package com.minim.messenger.activities
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import com.minim.messenger.R
+import com.minim.messenger.util.Navigation
 import kotlinx.android.synthetic.main.activity_signing.*
 import java.util.concurrent.TimeUnit
 
@@ -20,7 +20,7 @@ class SigningActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         FirebaseAuth.getInstance().currentUser ?: return
-        startActivity(this, ConversationsActivity::class.java)
+        Navigation.start(this, ConversationsActivity::class.java, true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +48,11 @@ class SigningActivity : AppCompatActivity() {
 
         override fun onCodeSent(verificationId: String?, token: PhoneAuthProvider.ForceResendingToken) {
             // Save verification ID and resending token so we can use them later
-            val intent = Intent(this@SigningActivity, VerificationActivity::class.java)
-                .putExtra("verificationId", verificationId)
-            startActivity(intent)
-            finish()
+            Navigation.start(
+                this@SigningActivity,
+                VerificationActivity::class.java,
+                stringExtra = "verificationId" to verificationId
+            )
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
@@ -68,7 +69,7 @@ class SigningActivity : AppCompatActivity() {
 
     companion object {
 
-        fun signIn(context: Activity, credential: PhoneAuthCredential) {
+        fun signIn(activity: Activity, credential: PhoneAuthCredential) {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener {
                 val isNewUser = it.result?.additionalUserInfo!!.isNewUser
                 val destination = if (isNewUser) {
@@ -76,16 +77,8 @@ class SigningActivity : AppCompatActivity() {
                 } else {
                     ConversationsActivity::class.java
                 }
-                startActivity(context, destination)
+                Navigation.start(activity, destination, true)
             }
-        }
-
-        fun startActivity(context: Activity, destination: Class<out AppCompatActivity>) {
-            val intent = Intent(context, destination)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-            context.finish()
         }
 
     }

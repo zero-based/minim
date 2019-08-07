@@ -1,7 +1,5 @@
 package com.minim.messenger.activities
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +12,7 @@ import com.minim.messenger.R
 import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
+import com.minim.messenger.util.Navigation
 import com.minim.messenger.util.Security
 import kotlinx.android.synthetic.main.activity_conversation_log.*
 
@@ -81,14 +80,9 @@ class ConversationLogActivity : AppCompatActivity() {
     }
 
     private fun sendEmail() {
-        val emailIntent = Intent(
-            Intent.ACTION_SENDTO,
-            Uri.fromParts("mailto", "${conversation.other.email}", null)
-        )
         val appName = resources.getString(R.string.app_name)
         val subject = "[$appName] Attachment from ${conversation.user.username}"
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-        startActivity(Intent.createChooser(emailIntent, "Send email..."))
+        Navigation.sendEmail(this, conversation.other.email!!, subject)
     }
 
     private fun initConversationListener() {
