@@ -41,6 +41,7 @@ class ConversationsAdapter(private val context: Activity, val conversations: Arr
 
         holder.parentLayout.setOnClickListener {
 
+            currentConversationId = conversation.id!!
             conversation.messages.clear()
             Security.setKey(conversation.secret!!)
 
@@ -117,6 +118,10 @@ class ConversationsAdapter(private val context: Activity, val conversations: Arr
         internal var otherUsername: TextView = itemView.findViewById(R.id.other_username)
         internal var hasChanges: ImageView = itemView.findViewById(R.id.notification_blink)
         internal var parentLayout: LinearLayout = itemView.findViewById(R.id.contact_linear_layout)
+    }
+
+    companion object {
+        var currentConversationId: String = ""
     }
 
 }

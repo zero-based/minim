@@ -173,8 +173,9 @@ class ConversationsActivity : AppCompatActivity() {
     @Suppress("UNCHECKED_CAST")
     private fun newMessageNotification(document: QueryDocumentSnapshot) {
 
+        val id = document.data["id"].toString()
         val messagesIds = document.data["messages"] as ArrayList<String>
-        if (messagesIds.isEmpty()) {
+        if (messagesIds.isEmpty() || id == ConversationsAdapter.currentConversationId) {
             return
         }
 
@@ -187,7 +188,6 @@ class ConversationsActivity : AppCompatActivity() {
             if (message.sender == currentUser.uid) {
                 return@addOnSuccessListener
             }
-            val id = document.data["id"].toString()
             val index = conversations.indexOfFirst { c -> c.id == id }
             val conversation = conversations[index]
             Security.setKey(conversation.secret!!)
