@@ -24,9 +24,8 @@
                                                app:layout_constraintTop_toBottomOf="@id/contact_username_text_view"
                                                app:layout_constraintLeft_toLeftOf="parent"
                                                app:layout_constraintRight_toRightOf="parent"
-                                               app:layout_constraintBottom_toTopOf="@id/input_linear_layout"/>
-
-    <LinearLayout android:id="@+id/input_linear_layout"
+                                               app:layout_constraintBottom_toTopOf="@id/linear_layout"/>
+    <LinearLayout android:id="@+id/linear_layout"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal"
@@ -36,58 +35,79 @@
                   app:layout_constraintRight_toRightOf="parent"
                   app:layout_constraintLeft_toLeftOf="parent">
 
-        <ImageButton android:id="@+id/attach_button"
-                     android:layout_width="24dp"
-                     android:layout_height="32dp"
-                     android:src="@drawable/attach_file_icon"
-                     android:background="@android:color/transparent"/>
+        <LinearLayout android:id="@+id/input_linear_layout"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="center">
 
-        <EditText android:id="@+id/message_edit_text"
-                  android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:layout_marginStart="8dp"
-                  android:layout_marginEnd="8dp"
-                  android:hint="@string/type_a_message"
-                  android:textSize="16sp"
-                  android:maxLength="@integer/message_max_length"
-                  android:maxLines="2"
-                  android:textColorHint="@android:color/tertiary_text_dark"
-                  android:textColor="@android:color/white"
-                  android:inputType="textMultiLine|textCapSentences"
-                  android:background="@drawable/rounded_container"/>
+            <ImageButton android:id="@+id/attach_button"
+                         android:layout_width="24dp"
+                         android:layout_height="32dp"
+                         android:src="@drawable/attach_file_icon"
+                         android:background="@android:color/transparent"/>
 
-        <me.angrybyte.numberpicker.view.ActualNumberPicker
-                android:id="@+id/duration_value_picker"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:text_size="16sp"
-                app:bar_width="1dp"
-                app:bars_count="16"
-                android:background="@android:color/transparent"
-                app:bar_color="@color/colorAccent"
-                app:highlight_color="@color/colorPrimary"
-                app:selection_color="@android:color/white"
-                app:text_color="@android:color/white"
-                app:show_bars="true"
-                app:show_text="true"
-                android:visibility="gone"
-                app:show_controls="false"
-                app:show_fast_controls="false"/>
-
-        <NumberPicker android:id="@+id/duration_unit_picker"
-                      android:layout_width="wrap_content"
-                      android:layout_height="match_parent"
+            <EditText android:id="@+id/message_edit_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
                       android:layout_marginStart="8dp"
                       android:layout_marginEnd="8dp"
-                      android:visibility="gone"
-                      android:descendantFocusability="blocksDescendants"
-                      android:theme="@style/AppTheme.Picker">
+                      android:hint="@string/type_a_message"
+                      android:textSize="16sp"
+                      android:maxLength="@integer/message_max_length"
+                      android:maxLines="2"
+                      android:textColorHint="@android:color/tertiary_text_dark"
+                      android:textColor="@android:color/white"
+                      android:inputType="textMultiLine|textCapSentences"
+                      android:background="@drawable/rounded_container"/>
+        </LinearLayout>
 
-        </NumberPicker>
+        <LinearLayout android:id="@+id/pickers_linear_layout"
+                      android:layout_width="0dp"
+                      android:layout_height="48dp"
+                      android:visibility="gone"
+                      android:gravity="center"
+                      android:layout_weight="1">
+
+            <NumberPicker android:id="@+id/hours_picker"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginEnd="8dp"
+                          android:descendantFocusability="blocksDescendants">
+            </NumberPicker>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/colon"
+                      android:textColor="@android:color/white">
+            </TextView>
+
+            <NumberPicker android:id="@+id/minutes_picker"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginEnd="8dp"
+                          android:descendantFocusability="blocksDescendants">
+
+            </NumberPicker>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/colon"
+                      android:textColor="@android:color/white">
+            </TextView>
+
+            <NumberPicker android:id="@+id/seconds_picker"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginEnd="8dp"
+                          android:descendantFocusability="blocksDescendants">
+
+            </NumberPicker>
+
+        </LinearLayout>
 
         <ImageButton android:id="@+id/send_button"
                      android:layout_width="48dp"

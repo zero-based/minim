@@ -13,4 +13,5 @@
     <string name="delete_account">Delete Account</string>
     <string name="sign_out">Sign Out</string>
     <string name="help">Help</string>
+    <string name="colon">:</string>
 </resources>
