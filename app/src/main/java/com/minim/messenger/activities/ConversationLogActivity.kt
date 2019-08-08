@@ -41,40 +41,25 @@ class ConversationLogActivity : AppCompatActivity() {
         attach_button.setOnClickListener { sendEmail() }
 
         send_button.setOnClickListener {
-            if (duration_value_picker.isShown) {
-                duration_value_picker.visibility = View.GONE
-                duration_unit_picker.visibility = View.GONE
-                message_edit_text.visibility = View.VISIBLE
-                attach_button.visibility = View.VISIBLE
-                message_edit_text.requestFocus()
+            if (!pickers_linear_layout.isShown) {
+                sendMessage(message_edit_text.text.toString())
             }
-            sendMessage(message_edit_text.text.toString())
         }
 
         send_button.setOnLongClickListener {
-            if (duration_value_picker.isShown) {
-                duration_value_picker.visibility = View.GONE
-                duration_unit_picker.visibility = View.GONE
-                message_edit_text.visibility = View.VISIBLE
-                attach_button.visibility = View.VISIBLE
+            if (pickers_linear_layout.isShown) {
+                input_linear_layout.visibility = View.VISIBLE
+                pickers_linear_layout.visibility = View.GONE
+                send_button.setImageResource(R.drawable.send_icon)
                 message_edit_text.requestFocus()
             } else {
-                message_edit_text.visibility = View.GONE
-                attach_button.visibility = View.GONE
-                duration_value_picker.visibility = View.VISIBLE
-                duration_unit_picker.visibility = View.VISIBLE
+                input_linear_layout.visibility = View.GONE
+                pickers_linear_layout.visibility = View.VISIBLE
+                send_button.setImageResource(R.drawable.close_icon)
             }
             return@setOnLongClickListener true
         }
 
-        duration_unit_picker.setOnValueChangedListener { _, _, newValueIndex ->
-            when (newValueIndex) {
-                0 -> duration_value_picker.maxValue = 59
-                1 -> duration_value_picker.maxValue = 59
-                2 -> duration_value_picker.maxValue = 24
-                3 -> duration_unit_picker.value = 0
-            }
-        }
     }
 
     private fun initRecyclerView() {
@@ -85,15 +70,22 @@ class ConversationLogActivity : AppCompatActivity() {
     }
 
     private fun initDurationSettings() {
-        val values = arrayOf("sec.", "min.", "hr.", "")
-        duration_unit_picker.minValue = 0
-        duration_unit_picker.maxValue = values.lastIndex
-        duration_unit_picker.displayedValues = values
-        duration_unit_picker.wrapSelectorWheel = true
-        duration_value_picker.minValue = 1
-        duration_value_picker.maxValue = 24
-        duration_value_picker.value = 24
-        duration_unit_picker.value = values.indexOf("hr.")
+
+        hours_picker.maxValue = 24
+        minutes_picker.maxValue = 59
+        seconds_picker.maxValue = 59
+
+        // Defaults
+        hours_picker.value = 0
+        minutes_picker.value = 0
+        seconds_picker.value = 10
+
+    }
+
+    private fun sendEmail() {
+        val appName = resources.getString(R.string.app_name)
+        val subject = "[$appName] Attachment from ${conversation.user.username}"
+        Navigation.sendEmail(this, conversation.other.email!!, subject)
     }
 
     private fun sendMessage(messageText: String) {
@@ -123,10 +115,11 @@ class ConversationLogActivity : AppCompatActivity() {
 
     }
 
-    private fun sendEmail() {
-        val appName = resources.getString(R.string.app_name)
-        val subject = "[$appName] Attachment from ${conversation.user.username}"
-        Navigation.sendEmail(this, conversation.other.email!!, subject)
+    private fun getDurationValue(): Long {
+        val hours = hours_picker.value.toLong()
+        val minutes = minutes_picker.value.toLong()
+        val seconds = seconds_picker.value.toLong()
+        return TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes) + seconds
     }
 
     private fun initConversationListener() {
@@ -179,16 +172,6 @@ class ConversationLogActivity : AppCompatActivity() {
         val index = conversation.getMessageIndex(message.id!!)
         conversation.messages.removeAt(index)
         adapter.notifyItemRemoved(index)
-    }
-
-    private fun getDurationValue(): Long {
-        val value = duration_value_picker.value.toLong()
-        return when (duration_unit_picker.value) {
-            0 -> value
-            1 -> TimeUnit.MINUTES.toSeconds(value)
-            2 -> TimeUnit.HOURS.toSeconds(value)
-            else -> TimeUnit.HOURS.toSeconds(resources.getInteger(R.integer.default_destruction_hours).toLong())
-        }
     }
 
     override fun onBackPressed() {

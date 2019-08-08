@@ -3,5 +3,4 @@
     <integer name="username_max_length">18</integer>
     <integer name="message_max_length">120</integer>
     <integer name="verification_code_max_length">120</integer>
-    <integer name="default_destruction_hours">24</integer>
 </resources>
