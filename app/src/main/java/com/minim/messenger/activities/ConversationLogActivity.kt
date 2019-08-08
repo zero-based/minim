@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.minim.messenger.R
+import com.minim.messenger.adapters.ConversationsAdapter
 import com.minim.messenger.adapters.MessagesAdapter
 import com.minim.messenger.models.Conversation
 import com.minim.messenger.models.Message
@@ -193,6 +194,7 @@ class ConversationLogActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         messagesListener.remove()
+        ConversationsAdapter.currentConversationId = ""
     }
 }
 
