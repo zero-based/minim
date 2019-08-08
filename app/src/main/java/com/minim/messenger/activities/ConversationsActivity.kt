@@ -61,16 +61,21 @@ class ConversationsActivity : AppCompatActivity() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val query = s.toString()
-                adapter.filter.filter(query) {
-                    if (query == currentUser.username || adapter.itemCount != 0 || query.isEmpty()) {
-                        add_contact_button.visibility = View.GONE
-                    } else {
-                        add_contact_button.visibility = View.VISIBLE
-                    }
-                }
+                adapter.filter.filter(query)
+                controlAddition(query)
             }
         })
 
+    }
+
+    private fun controlAddition(query: String) {
+        val isExisting = conversations.any { it.other.username == query }
+        val isCurrent = query == currentUser.username
+        if (isCurrent || isExisting || query.isEmpty()) {
+            add_contact_button.visibility = View.GONE
+        } else {
+            add_contact_button.visibility = View.VISIBLE
+        }
     }
 
     private fun initRecyclerView() {
