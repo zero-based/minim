@@ -2,7 +2,7 @@
 app_name                           : minim
 app_description                    : Rethinking what a chat app means.
 app_icon                           : https://raw.githubusercontent.com/MichaelSafwatHanna/minim/master/app/src/main/ic_launcher-web.png
-repository                         : MichaelSafwatHanna/minim
+repository                         : zero-based/minim
 
 # Feature List
 features                           :
